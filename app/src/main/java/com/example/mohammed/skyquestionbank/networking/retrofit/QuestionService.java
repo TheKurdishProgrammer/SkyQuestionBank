@@ -1,4 +1,4 @@
-package com.example.mohammed.skyquestionbank.networking;
+package com.example.mohammed.skyquestionbank.networking.retrofit;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -13,7 +13,7 @@ public class QuestionService {
         if (retrofit == null) {
             return retrofit = new Retrofit.Builder().
                     addConverterFactory(GsonConverterFactory.create()).
-                    baseUrl("").build();
+                    baseUrl(QuestionApiUrl.baseUrl).build();
         }
 
 

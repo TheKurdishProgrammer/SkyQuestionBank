@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "687267614417",
+    "firebase_url": "https://skyquestionbank-39c05.firebaseio.com",
+    "project_id": "skyquestionbank-39c05",
+    "storage_bucket": "skyquestionbank-39c05.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:687267614417:android:e97640bcfb379b80",
+        "android_client_info": {
+          "package_name": "com.example.mohammed.skyquestionbank"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "687267614417-m6tp4ss2q58edmqls6f3bm9daq3nt671.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mohammed.skyquestionbank",
+            "certificate_hash": "a1c59d4f8db5fdec9d9d26810add5fe8b3dee83f"
+          }
+        },
+        {
+          "client_id": "687267614417-erk4ualcc4jlj4a51pug2rsovfckcofg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABxnBvNKDQ-oaKphd5NF3EJWv56J23EFc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "687267614417-erk4ualcc4jlj4a51pug2rsovfckcofg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

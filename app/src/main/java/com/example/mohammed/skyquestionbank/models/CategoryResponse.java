@@ -4,16 +4,17 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class QuestionCategory {
+public class CategoryResponse {
 
     @SerializedName("trivia_categories")
-    private List<TriviaCategoriesBean> triviaCategories;
+    private List<Category> triviaCategories;
 
-    public List<TriviaCategoriesBean> getTriviaCategories() {
+    public List<Category> getTriviaCategories() {
         return triviaCategories;
     }
 
-    public void setTriviaCategories(List<TriviaCategoriesBean> triviaCategories) {
+    public void setTriviaCategories(List<Category> triviaCategories) {
         this.triviaCategories = triviaCategories;
     }
+
 }

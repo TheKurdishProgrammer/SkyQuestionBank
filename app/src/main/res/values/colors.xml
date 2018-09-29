@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+
+    <color name="colorPrimary">#3C3F41</color>
+    <color name="colorScreenBackground">#2B2B2B</color>
+    <color name="colorPrimaryDark">#313335</color>
+
+    <color name="colorAccent">#5C9553</color>
+    <color name="textColorPrimary">#CFB969</color>
+    <color name="textColorSecondary">#A9B7C6</color>
+    <color name="next_question_disabled">#c1c1c1</color>
 </resources>

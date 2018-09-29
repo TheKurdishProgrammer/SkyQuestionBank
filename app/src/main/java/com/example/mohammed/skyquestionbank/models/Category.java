@@ -2,7 +2,7 @@ package com.example.mohammed.skyquestionbank.models;
 
 import com.google.gson.annotations.SerializedName;
 
-class TriviaCategoriesBean {
+public class Category {
     /**
      * id : 9
      * name : General Knowledge

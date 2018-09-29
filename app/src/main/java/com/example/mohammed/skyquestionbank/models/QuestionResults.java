@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-class QuestionResults {
+public class QuestionResults {
     /**
      * category : Science: Computers
      * type : multiple
