@@ -61,6 +61,7 @@ public class QuestionActivity extends AppCompatActivity implements OnResponseCal
 
         binding.nextQuestion.setOnClickListener(v -> {
 
+
             // before going to the next question ,storing the current chosenAnswers
 
             userChosenAnswers.add(currentChosenAnswer);
