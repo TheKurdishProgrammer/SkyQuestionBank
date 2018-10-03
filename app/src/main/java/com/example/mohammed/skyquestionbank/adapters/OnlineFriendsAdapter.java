@@ -18,6 +18,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import static com.example.mohammed.skyquestionbank.ui.DuelChallengeActivity.OPPONENT_KEY;
+
 public class OnlineFriendsAdapter extends RecyclerView.Adapter<OnlineFriendsAdapter.OnlineFriendViewHolder> {
 
     private Context context;
@@ -52,14 +54,13 @@ public class OnlineFriendsAdapter extends RecyclerView.Adapter<OnlineFriendsAdap
             holder.userStatus.setBackgroundResource(R.drawable.online_icon);
 
             holder.itemView.setOnClickListener(v -> {
-                String playerId = users.get(holder.getAdapterPosition()).getPlayerId();
-                String uid = users.get(holder.getAdapterPosition()).getUid();
 
-                OSNotificationSender.sendNotification(playerId, uid);
+                String playerId = users.get(holder.getAdapterPosition()).getPlayerId();
+
+                OSNotificationSender.sendNotification(playerId);
 
                 Intent intent = new Intent(context, DuelChallengeActivity.class);
-                intent.putExtra(DuelChallengeActivity.OPPONENT_KEY,
-                        users.get(holder.getAdapterPosition()));
+                intent.putExtra(OPPONENT_KEY, users.get(holder.getAdapterPosition()));
 
                 context.startActivity(intent);
             });

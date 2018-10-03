@@ -3,6 +3,8 @@ package com.example.mohammed.skyquestionbank.oneSignal;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.mohammed.skyquestionbank.firebase.FirebaseQuestionReferences;
+
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -10,7 +12,7 @@ import java.util.Scanner;
 
 public class OSNotificationSender {
 
-    public static void sendNotification(String playerId, String uid) {
+    public static void sendNotification(String playerId) {
         AsyncTask.execute(() -> {
 
             try {
@@ -26,6 +28,7 @@ public class OSNotificationSender {
                 con.setRequestMethod("POST");
 
 
+                String uid = FirebaseQuestionReferences.getUid();
                 String strJsonBody = "{"
                         + "\"app_id\": \"01ea1fcb-281a-4934-a422-5fae6308c088\","
                         + "\"include_player_ids\": [\"" + playerId + "\"],"

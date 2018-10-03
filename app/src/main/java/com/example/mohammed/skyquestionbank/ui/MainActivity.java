@@ -53,10 +53,7 @@ public class MainActivity extends AppCompatActivity {
             questionCriteria.setArguments(bundle);
         }
 
-
         transactFragment(questionCriteria);
-
-
     }
 
     private void setupTheDrawer(Bundle savedInstance) {

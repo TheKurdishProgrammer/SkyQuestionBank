@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.example.mohammed.skyquestionbank.firebase.FirebaseQuestionReferences;
-import com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks;
-import com.example.mohammed.skyquestionbank.ui.DuelChallengeActivity;
 import com.example.mohammed.skyquestionbank.ui.MainActivity;
 import com.google.firebase.database.DatabaseReference;
 import com.onesignal.OSNotificationOpenResult;
@@ -14,6 +12,8 @@ import com.onesignal.OneSignal;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.DUEL_CHALLENGE_STATUS;
+import static com.example.mohammed.skyquestionbank.ui.DuelChallengeActivity.OPPONENR_ON_CRITERIA;
 import static com.example.mohammed.skyquestionbank.ui.MainActivity.CHALLENGE_STATUS;
 import static com.example.mohammed.skyquestionbank.ui.MainActivity.PLAYER_MULTIPLE;
 
@@ -41,7 +41,7 @@ public class MyNotificationOpenedHandler implements OneSignal.NotificationOpened
 
             DatabaseReference meAsOpponenetRef = FirebaseQuestionReferences.getMeAsOpponentRef(uid);
 
-            meAsOpponenetRef.child(FirebaseRefLinks.DUEL_CHALLENGE_STATUS).setValue(DuelChallengeActivity.OPPONENR_ON_CRITERIA);
+            meAsOpponenetRef.child(DUEL_CHALLENGE_STATUS).setValue(OPPONENR_ON_CRITERIA);
 
 
             Intent intent = new Intent(context, MainActivity.class);

@@ -8,4 +8,5 @@ public interface FirebaseRefLinks {
 
     String DUEL_CHALLENGE = "duel_challenges";
     String DUEL_CHALLENGE_STATUS = "status";
+    String DUEL_CHALLENGE_QUESTIONS = "questions";
 }

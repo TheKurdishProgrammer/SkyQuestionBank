@@ -29,11 +29,14 @@ import java.util.List;
 
 import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.DUEL_CHALLENGE_STATUS;
 import static com.example.mohammed.skyquestionbank.ui.DuelChallengeActivity.DUEL_MATCH_READY;
-import static com.example.mohammed.skyquestionbank.ui.MainActivity.PLAYER_MULTIPLE;
 import static com.example.mohammed.skyquestionbank.ui.QuestionActivity.AMOUNT;
 import static com.example.mohammed.skyquestionbank.ui.QuestionActivity.CAT_ID;
 import static com.example.mohammed.skyquestionbank.ui.QuestionActivity.DIFFICULTY;
+import static com.example.mohammed.skyquestionbank.ui.QuestionActivity.GAME_STATUS_KEY;
+import static com.example.mohammed.skyquestionbank.ui.QuestionActivity.PLAYER_TYPE;
+import static com.example.mohammed.skyquestionbank.ui.QuestionActivity.STATUS_MULTIPLE;
 import static com.example.mohammed.skyquestionbank.ui.QuestionActivity.TYPE;
+import static com.example.mohammed.skyquestionbank.ui.QuestionActivity.TYPE_OPPONENT;
 
 
 public class ChooseQuestionCriteriaFragment extends Fragment implements OnResponseCallback<CategoryResponse>, OnRecyclerItemClick {
@@ -68,11 +71,13 @@ public class ChooseQuestionCriteriaFragment extends Fragment implements OnRespon
 
             Intent intent = getIntentWithCriteria(new Intent(getContext(), QuestionActivity.class));
 
-            Bundle bundle = new Bundle();
-            int challengeStatus = bundle.getInt(MainActivity.CHALLENGE_STATUS);
-            if (challengeStatus == PLAYER_MULTIPLE) {
+            Bundle bundle = getArguments();
+
+            if (bundle != null) {
                 String uid = bundle.getString("uid");
                 intent.putExtra("uid", uid);
+                intent.putExtra(GAME_STATUS_KEY, STATUS_MULTIPLE);
+                intent.putExtra(PLAYER_TYPE, TYPE_OPPONENT);
                 DatabaseReference meAsOpponentRef = FirebaseQuestionReferences.getMeAsOpponentRef(uid);
                 meAsOpponentRef.child(DUEL_CHALLENGE_STATUS).setValue(DUEL_MATCH_READY);
             }

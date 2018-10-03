@@ -1,5 +1,6 @@
 package com.example.mohammed.skyquestionbank.ui;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,12 +13,16 @@ import com.example.mohammed.skyquestionbank.models.OnlineUser;
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
+import static com.example.mohammed.skyquestionbank.ui.QuestionActivity.PLAYER_TYPE;
+import static com.example.mohammed.skyquestionbank.ui.QuestionActivity.TYPE_CHALLENGOR;
+
 public class DuelChallengeActivity extends AppCompatActivity implements OnChallengeStatusChange {
 
 
     public static final String OPPONENT_KEY = "OPPONENT_KEY";
     public static final int OPPONENR_ON_CRITERIA = 1;
     public static final int DUEL_MATCH_READY = 2;
+    public static final int START_DUEL_NOW = 3;
     private ActivityDuelChellengeBinding binding;
     private OnlineUser user;
 
@@ -49,6 +54,8 @@ public class DuelChallengeActivity extends AppCompatActivity implements OnChalle
         binding.playerMeName.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
         binding.playerMeName.setText(user.getUserName());
 
+        binding.opponentStatus.setText(getString(R.string.waiting_for_opponent));
+
 
     }
 
@@ -57,14 +64,18 @@ public class DuelChallengeActivity extends AppCompatActivity implements OnChalle
 
 
         switch (status) {
+            case START_DUEL_NOW:
+                Intent intent = new Intent(this, QuestionActivity.class);
+                intent.putExtra(QuestionActivity.GAME_STATUS_KEY, QuestionActivity.STATUS_MULTIPLE);
+                intent.putExtra(PLAYER_TYPE, TYPE_CHALLENGOR);
+                startActivity(intent);
+                break;
             case DUEL_MATCH_READY:
                 binding.opponentStatus.setText(getString(R.string.match_will_start_now));
                 break;
             case OPPONENR_ON_CRITERIA:
                 binding.opponentStatus.setText(getString(R.string.player_on_creteria));
                 break;
-            default:
-                binding.opponentStatus.setText(getString(R.string.waiting_for_opponent));
         }
     }
 }

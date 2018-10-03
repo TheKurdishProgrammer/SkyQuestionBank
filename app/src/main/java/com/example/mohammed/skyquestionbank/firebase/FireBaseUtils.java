@@ -2,7 +2,6 @@ package com.example.mohammed.skyquestionbank.firebase;
 
 import android.support.annotation.NonNull;
 
-import com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks;
 import com.example.mohammed.skyquestionbank.interfaces.OnChallengeStatusChange;
 import com.example.mohammed.skyquestionbank.interfaces.OnFirebaseValueSent;
 import com.example.mohammed.skyquestionbank.interfaces.OnOnlineFriendListLoad;
@@ -17,6 +16,8 @@ import com.onesignal.OneSignal;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.DUEL_CHALLENGE_STATUS;
 
 public class FireBaseUtils {
 
@@ -89,8 +90,8 @@ public class FireBaseUtils {
 
     public static void getChallengeStatusChanges(OnChallengeStatusChange statusChange, String oppUid) {
 
-        DatabaseReference duelChallengeRef = FirebaseQuestionReferences.getMeAsChallengingRef(oppUid);
-        duelChallengeRef = duelChallengeRef.child(FirebaseRefLinks.DUEL_CHALLENGE_STATUS);
+        DatabaseReference duelChallengeRef = FirebaseQuestionReferences.getMeAsChallengingRef(oppUid)
+                .child(DUEL_CHALLENGE_STATUS);
 
 
         duelChallengeRef.addValueEventListener(new ValueEventListener() {
@@ -99,8 +100,6 @@ public class FireBaseUtils {
 
                 if (dataSnapshot.exists())
                     statusChange.onChange(dataSnapshot.getValue(Integer.class));
-                else
-                    statusChange.onChange(0);
             }
 
             @Override
