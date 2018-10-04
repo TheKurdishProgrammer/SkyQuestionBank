@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
 import com.example.mohammed.skyquestionbank.R;
 import com.example.mohammed.skyquestionbank.firebase.FireBaseUtils;
@@ -34,19 +35,29 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar = findViewById(R.id.toolbar_drawer);
 
+        Bundle bundle2 = getIntent().getExtras();
+
+
+        if (getIntent().hasExtra(CHALLENGE_STATUS))
+            Log.e("HAS", "YES");
+
         int challengeStatus = getIntent().getIntExtra(CHALLENGE_STATUS, PLAYER_SINGLE);
+        Log.e("PLAYER", "challenge Status" + challengeStatus);
 
 
         setupTheDrawer(savedInstanceState);
 
         ChooseQuestionCriteriaFragment questionCriteria = new ChooseQuestionCriteriaFragment();
 
-        if (challengeStatus == PLAYER_SINGLE)
+        if (challengeStatus == PLAYER_SINGLE) {
             FireBaseUtils.putUserOnline();
-        else {
+
+        } else {
             Bundle bundle = new Bundle();
+
             String uid = getIntent().getStringExtra("uid");
 
+            Log.e("PLAYER", "Im here" + uid);
             bundle.putInt(CHALLENGE_STATUS, challengeStatus);
             bundle.putString("uid", uid);
 

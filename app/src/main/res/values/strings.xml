@@ -122,5 +122,6 @@
     <string name="player_on_creteria">Player is Choosing Question Criteria</string>
     <string name="waiting_for_opponent">Waiting For Opponent To Accept</string>
     <string name="match_will_start_now">Done,Starting The Match…!</string>
+    <string name="user_on_question">Opponent on Question\n %1$d</string>
 
 </resources>

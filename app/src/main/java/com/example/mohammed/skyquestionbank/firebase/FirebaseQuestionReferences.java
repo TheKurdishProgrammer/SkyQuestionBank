@@ -67,4 +67,14 @@ public class FirebaseQuestionReferences {
                 .child(uid)
                 .child(getUid());
     }
+
+    public static DatabaseReference getOpponentOnCurrentQuestionRef(String uid, String playerType) {
+        return getMeAsOpponentRef(uid)
+                .child(playerType);
+    }
+
+    public static DatabaseReference getChallengerOnCurrentQuestionRef(String uid, String platerType) {
+        return getMeAsChallengingRef(uid)
+                .child(platerType);
+    }
 }

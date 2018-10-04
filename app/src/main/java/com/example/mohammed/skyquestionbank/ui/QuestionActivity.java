@@ -14,8 +14,8 @@ import com.example.mohammed.skyquestionbank.R;
 import com.example.mohammed.skyquestionbank.adapters.QuestionAdapter;
 import com.example.mohammed.skyquestionbank.databinding.ActivityQuestionBinding;
 import com.example.mohammed.skyquestionbank.firebase.FireBaseUtils;
-import com.example.mohammed.skyquestionbank.firebase.FirebaseQuestionReferences;
 import com.example.mohammed.skyquestionbank.interfaces.OnFirebaseValueSent;
+import com.example.mohammed.skyquestionbank.interfaces.OnQuestionNumberListener;
 import com.example.mohammed.skyquestionbank.interfaces.OnRecyclerItemClick;
 import com.example.mohammed.skyquestionbank.interfaces.OnResponseCallback;
 import com.example.mohammed.skyquestionbank.models.QuestionResponse;
@@ -30,11 +30,16 @@ import java.util.List;
 
 import io.fabric.sdk.android.services.common.SafeToast;
 
+import static com.example.mohammed.skyquestionbank.firebase.FirebaseQuestionReferences.getChallengerOnCurrentQuestionRef;
+import static com.example.mohammed.skyquestionbank.firebase.FirebaseQuestionReferences.getMeAsOpponentRef;
+import static com.example.mohammed.skyquestionbank.firebase.FirebaseQuestionReferences.getOpponentOnCurrentQuestionRef;
+import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.CHALLENGER_ON_QUESTION;
 import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.DUEL_CHALLENGE_QUESTIONS;
 import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.DUEL_CHALLENGE_STATUS;
+import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.OPPONENT_ON_QUESTION;
 import static com.example.mohammed.skyquestionbank.ui.DuelChallengeActivity.START_DUEL_NOW;
 
-public class QuestionActivity extends AppCompatActivity implements OnResponseCallback<QuestionResponse>, OnRecyclerItemClick, OnFirebaseValueSent {
+public class QuestionActivity extends AppCompatActivity implements OnQuestionNumberListener, OnResponseCallback<QuestionResponse>, OnRecyclerItemClick, OnFirebaseValueSent {
 
     public static final String AMOUNT = "amount";
     public static final String TYPE = "type";
@@ -58,6 +63,7 @@ public class QuestionActivity extends AppCompatActivity implements OnResponseCal
     private int playerType;
     private DatabaseReference oppRef;
     private int gamesStatus;
+    private DatabaseReference userOnQuestion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,18 +81,36 @@ public class QuestionActivity extends AppCompatActivity implements OnResponseCal
 
         setupRecyclerView();
         getQuestions();
+        setUserOnQuestionRef();
 
         binding.nextQuestion.setOnClickListener(v -> {
 
 
             // before going to the next question ,storing the current chosenAnswers
-
             userChosenAnswers.add(currentChosenAnswer);
 
             populateQuestion();
         });
 
 
+    }
+
+    private void setUserOnQuestionRef() {
+
+        //set a reference to the current player to update his/her current question
+        // and set a reference listener to listen to the opponents question chaning
+        if (playerType == TYPE_OPPONENT) {
+
+            userOnQuestion = getOpponentOnCurrentQuestionRef(uid, OPPONENT_ON_QUESTION);
+            FireBaseUtils.setOnCurrentQuestionNumberListener(
+                    this, getOpponentOnCurrentQuestionRef(uid, CHALLENGER_ON_QUESTION));
+
+        } else {
+
+            userOnQuestion = getChallengerOnCurrentQuestionRef(uid, CHALLENGER_ON_QUESTION);
+            FireBaseUtils.setOnCurrentQuestionNumberListener(this
+                    , getChallengerOnCurrentQuestionRef(uid, OPPONENT_ON_QUESTION));
+        }
     }
 
     private void setupRecyclerView() {
@@ -104,7 +128,13 @@ public class QuestionActivity extends AppCompatActivity implements OnResponseCal
             FireBaseUtils.sendUserWonPoints(wonPoints, this);
             return;
         }
+
+
         QuestionResults result = results.get(currentQuestion++);
+
+
+        //updating the on current question to let the user on which question im on now!
+        userOnQuestion.setValue(currentQuestion + 1);
 
 
         //setting the question
@@ -126,10 +156,9 @@ public class QuestionActivity extends AppCompatActivity implements OnResponseCal
 
     }
 
-    private void
-    getQuestions() {
+    private void getQuestions() {
 
-        if ((gamesStatus == STATUS_MULTIPLE) && (playerType == TYPE_OPPONENT)) {
+        if ((gamesStatus == STATUS_MULTIPLE) && (playerType == TYPE_CHALLENGOR)) {
 
             QuestionDataDownloader downloader = new QuestionDataDownloader();
             downloader.getChallengeQuestions(this, uid);
@@ -158,7 +187,7 @@ public class QuestionActivity extends AppCompatActivity implements OnResponseCal
 
             if (playerType == TYPE_OPPONENT) {
 
-                oppRef = FirebaseQuestionReferences.getMeAsOpponentRef(uid);
+                oppRef = getMeAsOpponentRef(uid);
                 oppRef.child(DUEL_CHALLENGE_QUESTIONS).setValue(response)
                         .addOnCompleteListener(task -> {
                             oppRef.child(DUEL_CHALLENGE_STATUS).setValue(START_DUEL_NOW).
@@ -205,6 +234,13 @@ public class QuestionActivity extends AppCompatActivity implements OnResponseCal
     @Override
     public void onSent() {
         Toast.makeText(this, "Tamam valueaka roisht", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onChange(int questionNumber) {
+        Log.e("QUESTION", String.valueOf(questionNumber));
+
+        binding.userOnQuestion.setText(getString(R.string.user_on_question, questionNumber));
     }
 
     private class TimerAsyncTask extends AsyncTask<Void, Integer, Void> {

@@ -30,7 +30,7 @@ public class MyNotificationOpenedHandler implements OneSignal.NotificationOpened
         // here update the real time saying player received your
         JSONObject jsonObject = result.notification.payload.additionalData;
 
-        if (jsonObject == null) {
+        if (jsonObject != null) {
 
             String uid = null;
             try {
@@ -39,15 +39,18 @@ public class MyNotificationOpenedHandler implements OneSignal.NotificationOpened
                 e.printStackTrace();
             }
 
-            DatabaseReference meAsOpponenetRef = FirebaseQuestionReferences.getMeAsOpponentRef(uid);
+            DatabaseReference meAsOpponentRef = FirebaseQuestionReferences.getMeAsOpponentRef(uid);
 
-            meAsOpponenetRef.child(DUEL_CHALLENGE_STATUS).setValue(OPPONENR_ON_CRITERIA);
+            meAsOpponentRef.child(DUEL_CHALLENGE_STATUS).setValue(OPPONENR_ON_CRITERIA);
+
 
 
             Intent intent = new Intent(context, MainActivity.class);
+
             intent.putExtra(CHALLENGE_STATUS, PLAYER_MULTIPLE);
             intent.putExtra("uid", uid);
-            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             context.startActivity(intent);
 
         }

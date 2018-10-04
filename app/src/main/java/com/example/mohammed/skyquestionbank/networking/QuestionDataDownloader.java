@@ -48,7 +48,7 @@ public class QuestionDataDownloader {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
 
-                    QuestionResponse response = (QuestionResponse) dataSnapshot.getValue();
+                    QuestionResponse response = dataSnapshot.getValue(QuestionResponse.class);
                     responseCallback.onResponse(response);
                 }
             }

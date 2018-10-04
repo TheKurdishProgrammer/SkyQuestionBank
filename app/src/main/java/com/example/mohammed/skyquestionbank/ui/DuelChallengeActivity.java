@@ -66,6 +66,7 @@ public class DuelChallengeActivity extends AppCompatActivity implements OnChalle
         switch (status) {
             case START_DUEL_NOW:
                 Intent intent = new Intent(this, QuestionActivity.class);
+                intent.putExtra("uid", user.getUid());
                 intent.putExtra(QuestionActivity.GAME_STATUS_KEY, QuestionActivity.STATUS_MULTIPLE);
                 intent.putExtra(PLAYER_TYPE, TYPE_CHALLENGOR);
                 startActivity(intent);

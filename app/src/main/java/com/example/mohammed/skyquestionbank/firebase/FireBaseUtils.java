@@ -1,10 +1,13 @@
 package com.example.mohammed.skyquestionbank.firebase;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.example.mohammed.skyquestionbank.interfaces.OnChallengeStatusChange;
 import com.example.mohammed.skyquestionbank.interfaces.OnFirebaseValueSent;
 import com.example.mohammed.skyquestionbank.interfaces.OnOnlineFriendListLoad;
+import com.example.mohammed.skyquestionbank.interfaces.OnQuestionNumberListener;
+import com.example.mohammed.skyquestionbank.interfaces.OnUserLoggedIn;
 import com.example.mohammed.skyquestionbank.models.OnlineUser;
 import com.example.mohammed.skyquestionbank.models.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,11 +45,29 @@ public class FireBaseUtils {
         });
     }
 
-    public static void createUser(User user, OnFirebaseValueSent valueSent) {
+    public static void createUser(OnUserLoggedIn loggedIn) {
+        FirebaseQuestionReferences.getUserRef().addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    loggedIn.loggedIn();
+                } else {
+                    User user = new User();
+                    user.setEasyQuestions(0);
+                    user.setMediumQuestions(0);
+                    user.setHardQuestions(0);
+                    user.setPoints(0);
+                    DatabaseReference userRef = FirebaseQuestionReferences.getUserRef();
+                    userRef.setValue(user).
+                            addOnCompleteListener(task -> loggedIn.loggedIn());
+                }
+            }
 
-        DatabaseReference userRef = FirebaseQuestionReferences.getUserRef();
-        userRef.setValue(user).
-                addOnCompleteListener(task -> valueSent.onSent());
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public static void getOnlineFriendList(OnOnlineFriendListLoad friendListLoad) {
@@ -107,5 +128,25 @@ public class FireBaseUtils {
 
             }
         });
+    }
+
+    public static void setOnCurrentQuestionNumberListener(OnQuestionNumberListener numberListener, DatabaseReference challengerOnCurrentQuestionRef) {
+        challengerOnCurrentQuestionRef.addValueEventListener(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Log.e("QUESTION", dataSnapshot.getRef().toString());
+                        if (dataSnapshot.exists())
+                            numberListener.onChange(dataSnapshot.getValue(Integer.class));
+                        else
+                            numberListener.onChange(1);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                }
+        );
     }
 }
