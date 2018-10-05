@@ -26,6 +26,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         this.context = context;
         this.categories = categories;
         this.listener = listener;
+        setHasStableIds(true);
     }
 
     @NonNull
@@ -38,8 +39,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
-        if (position == 0) {
+        if (holder.getAdapterPosition() == 0) {
             holder.catRadio.setChecked(true);
             lastHolder = holder;
         }
@@ -61,11 +67,16 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     }
 
     @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
     public int getItemCount() {
         return categories.size();
     }
 
-    public class CategoryViewHolder extends RecyclerView.ViewHolder {
+    class CategoryViewHolder extends RecyclerView.ViewHolder {
 
         private RadioButton catRadio;
         private TextView catName;

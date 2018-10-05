@@ -11,6 +11,7 @@ import com.example.mohammed.skyquestionbank.R;
 
 public class ScrollingActivity extends AppCompatActivity {
 
+    //todo delete this
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -35,7 +35,7 @@ public class FireBaseUtils {
 
                 int currentUnderpants = dataSnapshot.getValue(Integer.class);
                 dataSnapshot.getRef().setValue(currentUnderpants + wonPoints)
-                        .addOnCompleteListener(task -> onValueSent.onSent());
+                        .addOnCompleteListener(task -> onValueSent.onSent(wonPoints));
             }
 
             @Override

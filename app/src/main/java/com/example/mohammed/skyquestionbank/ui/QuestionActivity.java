@@ -1,7 +1,8 @@
 package com.example.mohammed.skyquestionbank.ui;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -14,21 +15,23 @@ import com.example.mohammed.skyquestionbank.R;
 import com.example.mohammed.skyquestionbank.adapters.QuestionAdapter;
 import com.example.mohammed.skyquestionbank.databinding.ActivityQuestionBinding;
 import com.example.mohammed.skyquestionbank.firebase.FireBaseUtils;
+import com.example.mohammed.skyquestionbank.firebase.FirebaseQuestionReferences;
+import com.example.mohammed.skyquestionbank.interfaces.OnChallengeDifficulityLoad;
 import com.example.mohammed.skyquestionbank.interfaces.OnFirebaseValueSent;
 import com.example.mohammed.skyquestionbank.interfaces.OnQuestionNumberListener;
 import com.example.mohammed.skyquestionbank.interfaces.OnRecyclerItemClick;
 import com.example.mohammed.skyquestionbank.interfaces.OnResponseCallback;
+import com.example.mohammed.skyquestionbank.interfaces.OnTimeProgressUpdate;
 import com.example.mohammed.skyquestionbank.models.QuestionResponse;
 import com.example.mohammed.skyquestionbank.models.QuestionResults;
 import com.example.mohammed.skyquestionbank.networking.QuestionDataDownloader;
 import com.example.mohammed.skyquestionbank.utils.AnswerChecker;
 import com.example.mohammed.skyquestionbank.utils.HTMLDecoder;
+import com.example.mohammed.skyquestionbank.utils.TimerAsyncTask;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import io.fabric.sdk.android.services.common.SafeToast;
 
 import static com.example.mohammed.skyquestionbank.firebase.FirebaseQuestionReferences.getChallengerOnCurrentQuestionRef;
 import static com.example.mohammed.skyquestionbank.firebase.FirebaseQuestionReferences.getMeAsOpponentRef;
@@ -37,9 +40,14 @@ import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.C
 import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.DUEL_CHALLENGE_QUESTIONS;
 import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.DUEL_CHALLENGE_STATUS;
 import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.OPPONENT_ON_QUESTION;
+import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.QUESTION_DIFFICULITY;
 import static com.example.mohammed.skyquestionbank.ui.DuelChallengeActivity.START_DUEL_NOW;
+import static com.example.mohammed.skyquestionbank.ui.WinActivity.GAME_RESULT;
+import static com.example.mohammed.skyquestionbank.ui.WinActivity.RESULT_LOST;
+import static com.example.mohammed.skyquestionbank.ui.WinActivity.RESULT_WIN;
 
-public class QuestionActivity extends AppCompatActivity implements OnQuestionNumberListener, OnResponseCallback<QuestionResponse>, OnRecyclerItemClick, OnFirebaseValueSent {
+public class QuestionActivity extends AppCompatActivity implements
+        OnTimeProgressUpdate, OnQuestionNumberListener, OnChallengeDifficulityLoad, OnResponseCallback<QuestionResponse>, OnRecyclerItemClick, OnFirebaseValueSent {
 
     public static final String AMOUNT = "amount";
     public static final String TYPE = "type";
@@ -64,6 +72,8 @@ public class QuestionActivity extends AppCompatActivity implements OnQuestionNum
     private DatabaseReference oppRef;
     private int gamesStatus;
     private DatabaseReference userOnQuestion;
+    private ProgressDialog progressDialog;
+    private String difficulty;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,20 +85,23 @@ public class QuestionActivity extends AppCompatActivity implements OnQuestionNum
         gamesStatus = getIntent().getIntExtra(GAME_STATUS_KEY, STATUS_SINGLE);
 
 
-        if (gamesStatus == STATUS_MULTIPLE)
+        if (gamesStatus == STATUS_MULTIPLE) {
             playerType = getIntent().getIntExtra(PLAYER_TYPE, TYPE_CHALLENGOR);
-
+            setUserOnQuestionRef();
+        }
 
         setupRecyclerView();
         getQuestions();
-        setUserOnQuestionRef();
+
 
         binding.nextQuestion.setOnClickListener(v -> {
 
-
-            // before going to the next question ,storing the current chosenAnswers
             userChosenAnswers.add(currentChosenAnswer);
 
+            if (checkIfGameFinished())
+                return;
+
+            // before going to the next question ,storing the current chosenAnswers
             populateQuestion();
         });
 
@@ -121,20 +134,12 @@ public class QuestionActivity extends AppCompatActivity implements OnQuestionNum
 
     private void populateQuestion() {
 
-
-        if (currentQuestion == results.size()) {
-            Toast.makeText(this, "We are out of question", Toast.LENGTH_LONG).show();
-            int wonPoints = AnswerChecker.getCorrectAnswerPoints(results, userChosenAnswers);
-            FireBaseUtils.sendUserWonPoints(wonPoints, this);
-            return;
-        }
-
+        //updating the on current question to let the user on which question im on now!
 
         QuestionResults result = results.get(currentQuestion++);
 
-
-        //updating the on current question to let the user on which question im on now!
-        userOnQuestion.setValue(currentQuestion + 1);
+        if (gamesStatus == STATUS_MULTIPLE)
+            userOnQuestion.setValue(currentQuestion);
 
 
         //setting the question
@@ -146,7 +151,6 @@ public class QuestionActivity extends AppCompatActivity implements OnQuestionNum
         binding.answers.setAdapter(new QuestionAdapter(this, result.getIncorrectAnswers()
                 , result.getCorrectAnswer(), this));
 
-        Log.e("CORRECT", currentQuestion + "");
 
         Log.e("CORRECT", result.getCorrectAnswer());
 
@@ -156,18 +160,45 @@ public class QuestionActivity extends AppCompatActivity implements OnQuestionNum
 
     }
 
+    private boolean checkIfGameFinished() {
+
+        if (currentQuestion == results.size()) {
+
+            if (gamesStatus == STATUS_MULTIPLE)
+                userOnQuestion.setValue(currentQuestion + 1);
+
+            Toast.makeText(this, "We are out of question", Toast.LENGTH_LONG).show();
+            int wonPoints = AnswerChecker.getCorrectAnswerPoints(difficulty, results, userChosenAnswers);
+            FireBaseUtils.sendUserWonPoints(wonPoints, this);
+
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Calculating Points");
+            progressDialog.show();
+            return true;
+
+        }
+
+
+        return false;
+    }
+
     private void getQuestions() {
 
         if ((gamesStatus == STATUS_MULTIPLE) && (playerType == TYPE_CHALLENGOR)) {
 
             QuestionDataDownloader downloader = new QuestionDataDownloader();
             downloader.getChallengeQuestions(this, uid);
+            downloader.getChallengeQuestionDifficulity(this, uid);
 
         } else {
             int amount = getIntent().getIntExtra(AMOUNT, 10);
             String type = getIntent().getStringExtra(TYPE);
             int catId = getIntent().getIntExtra(CAT_ID, 9);
-            String difficulty = getIntent().getStringExtra(DIFFICULTY);
+
+            difficulty = getIntent().getStringExtra(DIFFICULTY);
+
+            DatabaseReference questionDiff = FirebaseQuestionReferences.getMeAsOpponentRef(uid);
+            questionDiff.child(QUESTION_DIFFICULITY).setValue(difficulty);
 
             QuestionDataDownloader dataDownloader = new QuestionDataDownloader();
             dataDownloader.getQuestions(amount, catId, type, difficulty, this);
@@ -201,7 +232,7 @@ public class QuestionActivity extends AppCompatActivity implements OnQuestionNum
         binding.questionLayout.setVisibility(View.VISIBLE);
         binding.waitDialogLayout.waitDialog.setVisibility(View.GONE);
 
-        asyncTask = new TimerAsyncTask();
+        asyncTask = new TimerAsyncTask(this);
         asyncTask.execute();
 
 
@@ -216,7 +247,8 @@ public class QuestionActivity extends AppCompatActivity implements OnQuestionNum
     @Override
     protected void onPause() {
         super.onPause();
-        asyncTask.cancel(true);
+        if (asyncTask != null)
+            asyncTask.cancel(true);
     }
 
     @Override
@@ -232,53 +264,54 @@ public class QuestionActivity extends AppCompatActivity implements OnQuestionNum
     }
 
     @Override
-    public void onSent() {
-        Toast.makeText(this, "Tamam valueaka roisht", Toast.LENGTH_SHORT).show();
+    public void onSent(int wonPoints) {
+
+        progressDialog.cancel();
+        Intent intent = new Intent(this, WinActivity.class);
+        intent.putExtra(WinActivity.USER_POINTS, wonPoints);
+        intent.putExtra(GAME_RESULT, RESULT_WIN);
+        startActivity(intent);
+        finish();
     }
 
     @Override
     public void onChange(int questionNumber) {
-        Log.e("QUESTION", String.valueOf(questionNumber));
 
-        binding.userOnQuestion.setText(getString(R.string.user_on_question, questionNumber));
-    }
-
-    private class TimerAsyncTask extends AsyncTask<Void, Integer, Void> {
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-
-            for (int i = 59; i >= 0 && !isCancelled(); i--) {
-                try {
-                    Thread.sleep(1000);
-
-                    onProgressUpdate(i);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
+        if (results != null)
+            if (questionNumber == results.size() + 1) {
+                Intent intent = new Intent(this, WinActivity.class);
+                intent.putExtra(GAME_RESULT, RESULT_LOST);
+                startActivity(intent);
+                userOnQuestion.getParent().removeValue();
+                finish();
+                return;
             }
+        binding.userOnQuestion.setText(getString(R.string.user_on_question, questionNumber));
 
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            // here check weather its finished with true result or failed with 0
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-
-            runOnUiThread(() -> {
-                binding.timeProgress.setStepCountText(String.valueOf(values[0]));
-                binding.timeProgress.setPercentage(6 * values[0]);
-                if (values[0] == 0)
-                    SafeToast.makeText(QuestionActivity.this, "Time is Up, try Again", Toast.LENGTH_LONG).show();
-            });
-        }
     }
 
+
+    @Override
+    public void onUpdate(int value) {
+
+        runOnUiThread(() -> {
+
+            binding.timeProgress.setStepCountText(String.valueOf(value));
+            binding.timeProgress.setPercentage(6 * value);
+
+            if (value == 0) {
+                Intent intent = new Intent(this, WinActivity.class);
+                intent.putExtra(WinActivity.GAME_RESULT, WinActivity.RESULT_LOST);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+
+    }
+
+    @Override
+    public void onLoad(String difficulty) {
+        this.difficulty = difficulty;
+    }
 }

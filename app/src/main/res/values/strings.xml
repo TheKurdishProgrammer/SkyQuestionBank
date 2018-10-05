@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SkyQuestionBank</string>
+    <string name="app_name">Sky Question Bank</string>
     <string name="title_activity_main2">Main2Activity</string>
     <string name="title_activity_scrolling">ScrollingActivity</string>
     <string name="large_text">
@@ -123,5 +123,8 @@
     <string name="waiting_for_opponent">Waiting For Opponent To Accept</string>
     <string name="match_will_start_now">Done,Starting The Match…!</string>
     <string name="user_on_question">Opponent on Question\n %1$d</string>
+    <string name="points_earned">%1$d Points Earned</string>
+    <string name="you_won">Congrats,You Won!</string>
+    <string name="you_failed">Times Up,You Failed!</string>
 
 </resources>

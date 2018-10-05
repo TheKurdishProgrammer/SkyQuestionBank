@@ -77,4 +77,5 @@ public class FirebaseQuestionReferences {
         return getMeAsChallengingRef(uid)
                 .child(platerType);
     }
+
 }

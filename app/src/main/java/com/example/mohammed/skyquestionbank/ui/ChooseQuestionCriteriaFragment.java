@@ -44,6 +44,17 @@ public class ChooseQuestionCriteriaFragment extends Fragment implements OnRespon
     private List<Category> categories;
     private int lastClickedCategoryRadionPos = -1;
     private QuizCriteriaBinding binding;
+
+
+    public final static String DIFFICULTY_EASY = "easy";
+    public final static String DIFFICULTY_MEDIUM = "medium";
+    public final static String DIFFICULTY_HARD = "hard";
+
+
+    public final static String TYPE_boolean = "boolean";
+    public final static String TYPE_multiple = "multiple";
+
+
     private int categoryId;
 
     public ChooseQuestionCriteriaFragment() {
@@ -109,12 +120,13 @@ public class ChooseQuestionCriteriaFragment extends Fragment implements OnRespon
         int typeId = binding.type.getCheckedRadioButtonId();
         String type = null;
 
+
         switch (typeId) {
             case R.id.bool:
-                type = "boolean";
+                type = TYPE_boolean;
                 break;
             case R.id.multi:
-                type = "multiple";
+                type = TYPE_multiple;
                 break;
         }
 
@@ -125,13 +137,13 @@ public class ChooseQuestionCriteriaFragment extends Fragment implements OnRespon
 
         switch (difficultyId) {
             case R.id.easy:
-                difficulty = "easy";
+                difficulty = DIFFICULTY_EASY;
                 break;
             case R.id.medium:
-                difficulty = "medium";
+                difficulty = DIFFICULTY_MEDIUM;
                 break;
             case R.id.hard:
-                difficulty = "hard";
+                difficulty = DIFFICULTY_HARD;
                 break;
 
         }

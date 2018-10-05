@@ -20,6 +20,7 @@
             android:label="@string/title_activity_scrolling"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+
             android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login">
             <intent-filter>
@@ -28,13 +29,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.QuestionActivity" />
-        <activity android:name=".ui.DuelChallengeActivity"></activity>
+        <activity
+            android:name=".ui.QuestionActivity"
+            android:label="Sky Challenge" />
+        <activity android:name=".ui.DuelChallengeActivity" />
 
         <meta-data
             android:name="com.onesignal.NotificationOpened.DEFAULT"
             android:value="DISABLE" />
 
+        <activity
+            android:name=".ui.WinActivity"
+            android:label="Challenge Result"></activity>
     </application>
 
 </manifest>

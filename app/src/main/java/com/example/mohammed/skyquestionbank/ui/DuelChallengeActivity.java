@@ -70,6 +70,7 @@ public class DuelChallengeActivity extends AppCompatActivity implements OnChalle
                 intent.putExtra(QuestionActivity.GAME_STATUS_KEY, QuestionActivity.STATUS_MULTIPLE);
                 intent.putExtra(PLAYER_TYPE, TYPE_CHALLENGOR);
                 startActivity(intent);
+                finish();
                 break;
             case DUEL_MATCH_READY:
                 binding.opponentStatus.setText(getString(R.string.match_will_start_now));

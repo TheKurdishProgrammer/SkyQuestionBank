@@ -11,4 +11,5 @@ public interface FirebaseRefLinks {
     String DUEL_CHALLENGE_QUESTIONS = "questions";
     String OPPONENT_ON_QUESTION = "opp_on_question";
     String CHALLENGER_ON_QUESTION = "challenger_on_question";
+    String QUESTION_DIFFICULITY = "QUESTION_DIFFICULITY";
 }
