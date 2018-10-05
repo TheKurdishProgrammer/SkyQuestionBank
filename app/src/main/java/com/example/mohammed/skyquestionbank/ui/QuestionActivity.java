@@ -169,7 +169,7 @@ public class QuestionActivity extends AppCompatActivity implements
 
             Toast.makeText(this, "We are out of question", Toast.LENGTH_LONG).show();
             int wonPoints = AnswerChecker.getCorrectAnswerPoints(difficulty, results, userChosenAnswers);
-            FireBaseUtils.sendUserWonPoints(wonPoints, this);
+            FireBaseUtils.sendUserWonPoints(difficulty, wonPoints, this);
 
             progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("Calculating Points");

@@ -21,20 +21,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.DUEL_CHALLENGE_STATUS;
+import static com.example.mohammed.skyquestionbank.ui.ChooseQuestionCriteriaFragment.DIFFICULTY_EASY;
+import static com.example.mohammed.skyquestionbank.ui.ChooseQuestionCriteriaFragment.DIFFICULTY_HARD;
+import static com.example.mohammed.skyquestionbank.ui.ChooseQuestionCriteriaFragment.DIFFICULTY_MEDIUM;
 
 public class FireBaseUtils {
 
-    public static void sendUserWonPoints(int wonPoints, OnFirebaseValueSent onValueSent) {
+    public static void sendUserWonPoints(String difficulity, int wonPoints, OnFirebaseValueSent onValueSent) {
 
 
-        DatabaseReference userRef = FirebaseQuestionReferences.getUserPointRef();
+        DatabaseReference userRef = FirebaseQuestionReferences.getUserRef();
 
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                int currentUnderpants = dataSnapshot.getValue(Integer.class);
-                dataSnapshot.getRef().setValue(currentUnderpants + wonPoints)
+                User user = dataSnapshot.getValue(User.class);
+
+                user.setPoints(user.getPoints() + wonPoints);
+
+
+                switch (difficulity) {
+                    case DIFFICULTY_EASY:
+                        user.setEasyQuestions(user.getEasyQuestions() + wonPoints);
+                        break;
+                    case DIFFICULTY_MEDIUM:
+                        user.setMediumQuestions(user.getMediumQuestions() + wonPoints / 2);
+                        break;
+                    case DIFFICULTY_HARD:
+                        user.setHardQuestions(user.getHardQuestions() + wonPoints / 3);
+                        break;
+                }
+
+                dataSnapshot.getRef().setValue(user)
                         .addOnCompleteListener(task -> onValueSent.onSent(wonPoints));
             }
 
