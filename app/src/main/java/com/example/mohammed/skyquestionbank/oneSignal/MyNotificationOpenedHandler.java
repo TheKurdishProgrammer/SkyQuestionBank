@@ -16,6 +16,7 @@ import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.D
 import static com.example.mohammed.skyquestionbank.ui.DuelChallengeActivity.OPPONENR_ON_CRITERIA;
 import static com.example.mohammed.skyquestionbank.ui.MainActivity.CHALLENGE_STATUS;
 import static com.example.mohammed.skyquestionbank.ui.MainActivity.PLAYER_MULTIPLE;
+import static com.example.mohammed.skyquestionbank.ui.MainActivity.UID;
 
 public class MyNotificationOpenedHandler implements OneSignal.NotificationOpenedHandler {
     private Context context;
@@ -34,7 +35,7 @@ public class MyNotificationOpenedHandler implements OneSignal.NotificationOpened
 
             String uid = null;
             try {
-                uid = jsonObject.getString("uid");
+                uid = jsonObject.getString(UID);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -48,7 +49,7 @@ public class MyNotificationOpenedHandler implements OneSignal.NotificationOpened
             Intent intent = new Intent(context, MainActivity.class);
 
             intent.putExtra(CHALLENGE_STATUS, PLAYER_MULTIPLE);
-            intent.putExtra("uid", uid);
+            intent.putExtra(UID, uid);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_NEW_TASK);
 //            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             context.startActivity(intent);

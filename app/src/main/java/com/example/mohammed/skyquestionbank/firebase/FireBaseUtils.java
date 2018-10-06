@@ -1,5 +1,6 @@
 package com.example.mohammed.skyquestionbank.firebase;
 
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -7,6 +8,7 @@ import com.example.mohammed.skyquestionbank.interfaces.OnChallengeStatusChange;
 import com.example.mohammed.skyquestionbank.interfaces.OnFirebaseValueSent;
 import com.example.mohammed.skyquestionbank.interfaces.OnOnlineFriendListLoad;
 import com.example.mohammed.skyquestionbank.interfaces.OnQuestionNumberListener;
+import com.example.mohammed.skyquestionbank.interfaces.OnUserLoad;
 import com.example.mohammed.skyquestionbank.interfaces.OnUserLoggedIn;
 import com.example.mohammed.skyquestionbank.models.OnlineUser;
 import com.example.mohammed.skyquestionbank.models.User;
@@ -72,11 +74,18 @@ public class FireBaseUtils {
                     loggedIn.loggedIn();
                 } else {
                     User user = new User();
+
+                    user.setUserName(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+                    Uri userPhoto = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl();
+
+                    user.setUserPhoto(userPhoto.toString());
+
                     user.setEasyQuestions(0);
                     user.setMediumQuestions(0);
                     user.setHardQuestions(0);
                     user.setPoints(0);
                     DatabaseReference userRef = FirebaseQuestionReferences.getUserRef();
+
                     userRef.setValue(user).
                             addOnCompleteListener(task -> loggedIn.loggedIn());
                 }
@@ -167,5 +176,44 @@ public class FireBaseUtils {
                     }
                 }
         );
+    }
+
+    public static void getUser(OnUserLoad load) {
+
+        FirebaseQuestionReferences.getUserRef()
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        load.onLoad(dataSnapshot.getValue(User.class));
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
+    public static void getUsers(OnUserLoad load) {
+
+        FirebaseQuestionReferences.getUserRef().getParent()
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        List<User> users = new ArrayList<>();
+
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            users.add(snapshot.getValue(User.class));
+                        }
+                        load.onLoad(users);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
     }
 }

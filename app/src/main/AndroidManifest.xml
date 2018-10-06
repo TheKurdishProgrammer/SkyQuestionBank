@@ -16,11 +16,6 @@
             android:name=".ui.MainActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
-            android:name=".models.ScrollingActivity"
-            android:label="@string/title_activity_scrolling"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-
             android:name=".ui.LoginActivity"
             android:label="@string/title_activity_login">
             <intent-filter>
@@ -40,7 +35,17 @@
 
         <activity
             android:name=".ui.WinActivity"
-            android:label="Challenge Result"></activity>
+            android:label="Challenge Result" />
+
+        <receiver android:name=".UserPointAppWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/user_point_app_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

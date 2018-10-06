@@ -5,6 +5,24 @@ public class User {
     private int hardQuestions;
     private int mediumQuestions;
     private int easyQuestions;
+    private String userName;
+    private String userPhoto;
+
+    public String getUserPhoto() {
+        return userPhoto;
+    }
+
+    public void setUserPhoto(String userPhoto) {
+        this.userPhoto = userPhoto;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
     public int getPoints() {
         return points;

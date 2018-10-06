@@ -22,6 +22,7 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 public class MainActivity extends AppCompatActivity {
 
 
+    public final static String UID = "uid";
     public final static int PLAYER_SINGLE = 1;
     public final static int PLAYER_MULTIPLE = 2;
     public final static String CHALLENGE_STATUS = "CHALLENGE_STATUS";
@@ -35,12 +36,6 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar = findViewById(R.id.toolbar_drawer);
 
-        Bundle bundle2 = getIntent().getExtras();
-
-
-        if (getIntent().hasExtra(CHALLENGE_STATUS))
-            Log.e("HAS", "YES");
-
         int challengeStatus = getIntent().getIntExtra(CHALLENGE_STATUS, PLAYER_SINGLE);
         Log.e("PLAYER", "challenge Status" + challengeStatus);
 
@@ -50,16 +45,17 @@ public class MainActivity extends AppCompatActivity {
         ChooseQuestionCriteriaFragment questionCriteria = new ChooseQuestionCriteriaFragment();
 
         if (challengeStatus == PLAYER_SINGLE) {
+            toolbar.setTitle(getString(R.string.choose_criteria));
             FireBaseUtils.putUserOnline();
 
         } else {
+            toolbar.setTitle(getString(R.string.challenge_friend));
             Bundle bundle = new Bundle();
 
-            String uid = getIntent().getStringExtra("uid");
+            String uid = getIntent().getStringExtra(UID);
 
-            Log.e("PLAYER", "Im here" + uid);
             bundle.putInt(CHALLENGE_STATUS, challengeStatus);
-            bundle.putString("uid", uid);
+            bundle.putString(UID, uid);
 
             questionCriteria.setArguments(bundle);
         }
@@ -87,17 +83,17 @@ public class MainActivity extends AppCompatActivity {
 
         //creating the drawer items
         PrimaryDrawerItem challengeYourSelf = new PrimaryDrawerItem();
-        challengeYourSelf.withIdentifier(1).withIcon(R.drawable.ic_person_black_24dp).withName("New Challenge");
+        challengeYourSelf.withIdentifier(1).withIcon(R.drawable.ic_person_black_24dp).withName(R.string.new_challenge);
 
 
         PrimaryDrawerItem challengeFriend = new PrimaryDrawerItem();
-        challengeFriend.withIdentifier(2).withIcon(R.drawable.ic_challenge_freind_black_24dp).withName("Challenge a Friend");
+        challengeFriend.withIdentifier(2).withIcon(R.drawable.ic_challenge_freind_black_24dp).withName(getString(R.string.challenge_friend));
 
         PrimaryDrawerItem leaderBoards = new PrimaryDrawerItem();
-        leaderBoards.withIdentifier(3).withIcon(R.drawable.ic_dashboard_black_24dp).withName("LeaderBoards");
+        leaderBoards.withIdentifier(3).withIcon(R.drawable.ic_dashboard_black_24dp).withName(getString(R.string.leadrboards));
 
         PrimaryDrawerItem about = new PrimaryDrawerItem();
-        about.withIdentifier(4).withIcon(R.drawable.ic_info_black_24dp).withName("About");
+        about.withIdentifier(4).withIcon(R.drawable.ic_info_black_24dp).withName(getString(R.string.about));
 
 
         // building the drawer
@@ -116,17 +112,19 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     switch (position) {
                         case 1:
-                            toolbar.setTitle("Challenge Yourself");
+                            toolbar.setTitle(R.string.choose_criteria);
                             transactFragment(new ChooseQuestionCriteriaFragment());
                             break;
                         case 2:
+                            toolbar.setTitle(getString(R.string.challenge_friend));
                             transactFragment(new ChallengeFriendFragment());
                             break;
-
                         case 3:
+                            toolbar.setTitle(getString(R.string.leadrboards));
                             transactFragment(new LeaderBoardsFragment());
                             break;
                         case 5:
+                            toolbar.setTitle(getString(R.string.about));
                             transactFragment(new AboutFragment());
                             break;
                     }

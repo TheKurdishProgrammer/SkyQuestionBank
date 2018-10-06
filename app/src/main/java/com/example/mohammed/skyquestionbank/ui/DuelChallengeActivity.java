@@ -13,6 +13,7 @@ import com.example.mohammed.skyquestionbank.models.OnlineUser;
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
+import static com.example.mohammed.skyquestionbank.ui.MainActivity.UID;
 import static com.example.mohammed.skyquestionbank.ui.QuestionActivity.PLAYER_TYPE;
 import static com.example.mohammed.skyquestionbank.ui.QuestionActivity.TYPE_CHALLENGOR;
 
@@ -66,7 +67,7 @@ public class DuelChallengeActivity extends AppCompatActivity implements OnChalle
         switch (status) {
             case START_DUEL_NOW:
                 Intent intent = new Intent(this, QuestionActivity.class);
-                intent.putExtra("uid", user.getUid());
+                intent.putExtra(UID, user.getUid());
                 intent.putExtra(QuestionActivity.GAME_STATUS_KEY, QuestionActivity.STATUS_MULTIPLE);
                 intent.putExtra(PLAYER_TYPE, TYPE_CHALLENGOR);
                 startActivity(intent);

@@ -42,7 +42,7 @@ public class FirebaseQuestionReferences {
 
     }
 
-    private static DatabaseReference getRef(String ref) {
+    public static DatabaseReference getRef(String ref) {
         return FirebaseDatabase.getInstance().getReference(ref);
     }
 

@@ -29,6 +29,7 @@ import java.util.List;
 
 import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.DUEL_CHALLENGE_STATUS;
 import static com.example.mohammed.skyquestionbank.ui.DuelChallengeActivity.DUEL_MATCH_READY;
+import static com.example.mohammed.skyquestionbank.ui.MainActivity.UID;
 import static com.example.mohammed.skyquestionbank.ui.QuestionActivity.AMOUNT;
 import static com.example.mohammed.skyquestionbank.ui.QuestionActivity.CAT_ID;
 import static com.example.mohammed.skyquestionbank.ui.QuestionActivity.DIFFICULTY;
@@ -85,8 +86,8 @@ public class ChooseQuestionCriteriaFragment extends Fragment implements OnRespon
             Bundle bundle = getArguments();
 
             if (bundle != null) {
-                String uid = bundle.getString("uid");
-                intent.putExtra("uid", uid);
+                String uid = bundle.getString(UID);
+                intent.putExtra(UID, uid);
                 intent.putExtra(GAME_STATUS_KEY, STATUS_MULTIPLE);
                 intent.putExtra(PLAYER_TYPE, TYPE_OPPONENT);
                 DatabaseReference meAsOpponentRef = FirebaseQuestionReferences.getMeAsOpponentRef(uid);
@@ -183,7 +184,6 @@ public class ChooseQuestionCriteriaFragment extends Fragment implements OnRespon
 
 
         categoryId = categories.get(position).getId();
-        Log.e("CATEGORY_ID", String.valueOf(categoryId));
     }
 
     public void onItemClicked(int position, String s) {

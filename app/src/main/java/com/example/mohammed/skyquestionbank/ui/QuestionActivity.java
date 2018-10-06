@@ -42,6 +42,7 @@ import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.D
 import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.OPPONENT_ON_QUESTION;
 import static com.example.mohammed.skyquestionbank.interfaces.FirebaseRefLinks.QUESTION_DIFFICULITY;
 import static com.example.mohammed.skyquestionbank.ui.DuelChallengeActivity.START_DUEL_NOW;
+import static com.example.mohammed.skyquestionbank.ui.MainActivity.UID;
 import static com.example.mohammed.skyquestionbank.ui.WinActivity.GAME_RESULT;
 import static com.example.mohammed.skyquestionbank.ui.WinActivity.RESULT_LOST;
 import static com.example.mohammed.skyquestionbank.ui.WinActivity.RESULT_WIN;
@@ -80,12 +81,13 @@ public class QuestionActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_question);
 
-        uid = getIntent().getStringExtra("uid");
 
         gamesStatus = getIntent().getIntExtra(GAME_STATUS_KEY, STATUS_SINGLE);
 
 
         if (gamesStatus == STATUS_MULTIPLE) {
+            uid = getIntent().getStringExtra(UID);
+
             playerType = getIntent().getIntExtra(PLAYER_TYPE, TYPE_CHALLENGOR);
             setUserOnQuestionRef();
         }
@@ -167,6 +169,7 @@ public class QuestionActivity extends AppCompatActivity implements
             if (gamesStatus == STATUS_MULTIPLE)
                 userOnQuestion.setValue(currentQuestion + 1);
 
+
             Toast.makeText(this, "We are out of question", Toast.LENGTH_LONG).show();
             int wonPoints = AnswerChecker.getCorrectAnswerPoints(difficulty, results, userChosenAnswers);
             FireBaseUtils.sendUserWonPoints(difficulty, wonPoints, this);
@@ -184,21 +187,25 @@ public class QuestionActivity extends AppCompatActivity implements
 
     private void getQuestions() {
 
-        if ((gamesStatus == STATUS_MULTIPLE) && (playerType == TYPE_CHALLENGOR)) {
+        if (gamesStatus == STATUS_MULTIPLE) {
+            if (playerType == TYPE_CHALLENGOR) {
 
-            QuestionDataDownloader downloader = new QuestionDataDownloader();
-            downloader.getChallengeQuestions(this, uid);
-            downloader.getChallengeQuestionDifficulity(this, uid);
+                QuestionDataDownloader downloader = new QuestionDataDownloader();
+                downloader.getChallengeQuestions(this, uid);
+                downloader.getChallengeQuestionDifficulity(this, uid);
+            }
+
+            difficulty = getIntent().getStringExtra(DIFFICULTY);
+            DatabaseReference questionDiff = FirebaseQuestionReferences.getMeAsOpponentRef(uid);
+            questionDiff.child(QUESTION_DIFFICULITY).setValue(difficulty);
 
         } else {
+
             int amount = getIntent().getIntExtra(AMOUNT, 10);
             String type = getIntent().getStringExtra(TYPE);
             int catId = getIntent().getIntExtra(CAT_ID, 9);
 
             difficulty = getIntent().getStringExtra(DIFFICULTY);
-
-            DatabaseReference questionDiff = FirebaseQuestionReferences.getMeAsOpponentRef(uid);
-            questionDiff.child(QUESTION_DIFFICULITY).setValue(difficulty);
 
             QuestionDataDownloader dataDownloader = new QuestionDataDownloader();
             dataDownloader.getQuestions(amount, catId, type, difficulty, this);
@@ -278,7 +285,7 @@ public class QuestionActivity extends AppCompatActivity implements
     public void onChange(int questionNumber) {
 
         if (results != null)
-            if (questionNumber == results.size() + 1) {
+            if (questionNumber == -1 || questionNumber == results.size() + 1) {
                 Intent intent = new Intent(this, WinActivity.class);
                 intent.putExtra(GAME_RESULT, RESULT_LOST);
                 startActivity(intent);
@@ -286,6 +293,7 @@ public class QuestionActivity extends AppCompatActivity implements
                 finish();
                 return;
             }
+
         binding.userOnQuestion.setText(getString(R.string.user_on_question, questionNumber));
 
     }
@@ -303,6 +311,7 @@ public class QuestionActivity extends AppCompatActivity implements
                 Intent intent = new Intent(this, WinActivity.class);
                 intent.putExtra(WinActivity.GAME_RESULT, WinActivity.RESULT_LOST);
                 startActivity(intent);
+                userOnQuestion.setValue(-1);
                 finish();
             }
         });
