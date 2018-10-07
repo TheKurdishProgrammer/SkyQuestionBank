@@ -42,6 +42,10 @@ import static com.example.mohammed.skyquestionbank.ui.QuestionActivity.TYPE_OPPO
 
 public class ChooseQuestionCriteriaFragment extends Fragment implements OnResponseCallback<CategoryResponse>, OnRecyclerItemClick {
 
+    public static final String SELECTED_CATEGORY = "SELECTED_CATEGORY";
+    private static final String CATEGORY_ID = "CATEGORY_ID";
+    private static final String SCROLL_POSITION = "SCROLL_POSITION";
+    private static final String CATEGORY_RESPONSE = "CATEGORY_RESPONSE";
     private List<Category> categories;
     private int lastClickedCategoryRadionPos = -1;
     private QuizCriteriaBinding binding;
@@ -55,8 +59,10 @@ public class ChooseQuestionCriteriaFragment extends Fragment implements OnRespon
     public final static String TYPE_boolean = "boolean";
     public final static String TYPE_multiple = "multiple";
 
-
+    private int[] scrollPosition;
     private int categoryId;
+    private int categoryPosition;
+    private CategoryResponse response;
 
     public ChooseQuestionCriteriaFragment() {
         // Required empty public constructor
@@ -68,13 +74,19 @@ public class ChooseQuestionCriteriaFragment extends Fragment implements OnRespon
         // Inflate the layout for this fragment
 
         binding = DataBindingUtil.inflate(inflater, R.layout.quiz_criteria, container, false);
-
-
         setListeners();
 
-        QuestionDataDownloader dataDownloader = new QuestionDataDownloader();
-        dataDownloader.getCategories(this);
+        if (savedInstanceState != null) {
+            categoryPosition = savedInstanceState.getInt(SELECTED_CATEGORY);
+            categoryId = savedInstanceState.getInt(CATEGORY_ID);
+            scrollPosition = savedInstanceState.getIntArray(SCROLL_POSITION);
+            response = savedInstanceState.getParcelable(CATEGORY_RESPONSE);
+            populateUi(response);
+        } else {
 
+            QuestionDataDownloader dataDownloader = new QuestionDataDownloader();
+            dataDownloader.getCategories(this);
+        }
         return binding.getRoot();
     }
 
@@ -100,6 +112,9 @@ public class ChooseQuestionCriteriaFragment extends Fragment implements OnRespon
         binding.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (view == null)
+                    return;
+
                 parent.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
                 TextView amount = (TextView) parent.getChildAt(0);
                 amount.setTextColor(ContextCompat.getColor(getContext(), R.color.md_white_1000));
@@ -115,6 +130,15 @@ public class ChooseQuestionCriteriaFragment extends Fragment implements OnRespon
 
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putInt(SELECTED_CATEGORY, categoryPosition);
+        outState.putInt(CATEGORY_ID, categoryId);
+        outState.putParcelable(CATEGORY_RESPONSE, response);
+
+        outState.putIntArray(SCROLL_POSITION, new int[]{binding.criteriaScroll.getScrollX(), binding.criteriaScroll.getScrollY()});
+        super.onSaveInstanceState(outState);
+    }
 
     private Intent getIntentWithCriteria(Intent intent) {
 
@@ -165,13 +189,23 @@ public class ChooseQuestionCriteriaFragment extends Fragment implements OnRespon
 
     @Override
     public void onResponse(CategoryResponse response) {
-        CategoryAdapter adapter = new CategoryAdapter(getContext(), response.getTriviaCategories(), this);
+
+        this.response = response;
+        populateUi(response);
+    }
+
+    private void populateUi(CategoryResponse response) {
+
+        CategoryAdapter adapter = new CategoryAdapter(categoryPosition, getContext(), response.getTriviaCategories(), this);
         binding.questionCategory.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         binding.questionCategory.setHasFixedSize(true);
         binding.questionCategory.setAdapter(adapter);
         categoryId = response.getTriviaCategories().get(0).getId();
         categories = response.getTriviaCategories();
         binding.waitDialogLayout.waitDialog.setVisibility(View.GONE);
+
+        if (scrollPosition != null)
+            binding.criteriaScroll.post(() -> binding.criteriaScroll.scrollTo(scrollPosition[0], scrollPosition[1]));
 
     }
 
@@ -182,7 +216,7 @@ public class ChooseQuestionCriteriaFragment extends Fragment implements OnRespon
 
     public void onItemClicked(int position) {
 
-
+        categoryPosition = position;
         categoryId = categories.get(position).getId();
     }
 

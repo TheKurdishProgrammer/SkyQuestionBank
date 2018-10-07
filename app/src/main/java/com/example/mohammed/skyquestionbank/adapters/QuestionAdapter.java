@@ -26,14 +26,16 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Answer
     private boolean isCorrectAnswerSet;
     private OnRecyclerItemClick onRecyclerItemClick;
     private AnswerViewHolder lastHolder;
+    private int lastSelectedAnswerBeforeRoration;
 
 
-    public QuestionAdapter(Context context, List<String> incorrectAnswers, String correctAnswer, OnRecyclerItemClick onRecyclerItemClick) {
+    public QuestionAdapter(int lastSelectedAnswerBeforeRoration, Context context, List<String> incorrectAnswers, String correctAnswer, OnRecyclerItemClick onRecyclerItemClick) {
         this.context = context;
         this.incorrectAnswers = incorrectAnswers;
         this.correctAnswer = correctAnswer;
         correctAnswerPositon = new Random().nextInt(incorrectAnswers.size() + 1);
         this.onRecyclerItemClick = onRecyclerItemClick;
+        this.lastSelectedAnswerBeforeRoration = lastSelectedAnswerBeforeRoration;
     }
 
 
@@ -50,16 +52,24 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.Answer
     public void onBindViewHolder(@NonNull AnswerViewHolder holder, int position) {
 
 
+        if (lastSelectedAnswerBeforeRoration != -1 && position == lastSelectedAnswerBeforeRoration) {
+            holder.answerCard.setCardBackgroundColor(ContextCompat.getColor(context, R.color.colorAccent));
+            lastHolder = holder;
+        }
+
         if (position == correctAnswerPositon) {
             holder.answer.setText(HTMLDecoder.decodeHtml(correctAnswer));
             isCorrectAnswerSet = true;
-        } else
+        } else {
+
             holder.answer.setText(isCorrectAnswerSet ?
                     HTMLDecoder.decodeHtml(incorrectAnswers.get(position - 1))
                     : HTMLDecoder.decodeHtml(incorrectAnswers.get(position)));
 
+        }
 
         holder.itemView.setOnClickListener(v -> {
+
 
             onRecyclerItemClick.onItemClicked(holder.getAdapterPosition(), holder.answer.getText().toString());
 

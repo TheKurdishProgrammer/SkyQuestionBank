@@ -31,7 +31,6 @@ import com.example.mohammed.skyquestionbank.utils.TimerAsyncTask;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.example.mohammed.skyquestionbank.firebase.FirebaseQuestionReferences.getChallengerOnCurrentQuestionRef;
 import static com.example.mohammed.skyquestionbank.firebase.FirebaseQuestionReferences.getMeAsOpponentRef;
@@ -55,11 +54,17 @@ public class QuestionActivity extends AppCompatActivity implements
     public static final String DIFFICULTY = "difficulty";
     public static final String CAT_ID = "CAT_ID";
     private static final int NO_QUESTION_RESULT = 1;
-    private List<QuestionResults> results;
+    private static final String CURRENT_TIME = "CURRENT_TIME";
+    private static final String CURRENT_QUESTION = "CURRENT_QUESTION";
+    private static final String USER_ANSWERS = "USER_ANSWERS";
+    private static final String CURRENT_CHOSEN_ASNWER = "CURRENT_CHOSEN_ASNWER";
+    private static final String QUESTION_RESULT = "QUESTION_RESULT";
+    private static final String CURRENT_CHOSEN_ASNWER_POSITION = "CURRENT_CHOSEN_ASNWER_POSITION";
+    private ArrayList<QuestionResults> results;
     private ActivityQuestionBinding binding;
     private int currentQuestion;
     private TimerAsyncTask asyncTask;
-    private List<String> userChosenAnswers;
+    private ArrayList<String> userChosenAnswers;
     private String currentChosenAnswer;
     private String uid;
 
@@ -75,6 +80,37 @@ public class QuestionActivity extends AppCompatActivity implements
     private DatabaseReference userOnQuestion;
     private ProgressDialog progressDialog;
     private String difficulty;
+    private int startTime;
+    private int currentChosenAnswerPosition;
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+
+        int time = asyncTask.getCurrentTime();
+        outState.putInt(CURRENT_TIME, time);
+
+
+        if (currentChosenAnswerPosition != -1)
+            outState.putInt(CURRENT_CHOSEN_ASNWER_POSITION, currentChosenAnswerPosition);
+
+        if (currentQuestion > 0)
+            outState.putInt(CURRENT_QUESTION, currentQuestion - 1);
+
+        if (userChosenAnswers != null)
+            outState.putStringArrayList(USER_ANSWERS, userChosenAnswers);
+
+        if (currentChosenAnswer != null)
+            outState.putString(CURRENT_CHOSEN_ASNWER, currentChosenAnswer);
+
+        if (results != null)
+            outState.putParcelableArrayList(QUESTION_RESULT, results);
+
+        if (!getIntent().hasExtra(DIFFICULTY))
+            outState.putString(DIFFICULTY, difficulty);
+
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,10 +128,55 @@ public class QuestionActivity extends AppCompatActivity implements
             setUserOnQuestionRef();
         }
 
+        if (savedInstanceState != null) {
+
+            restoreStates(savedInstanceState);
+            populateQuestion();
+
+
+        } else {
+            startTime = 60;
+            currentChosenAnswerPosition = -1;
+            getQuestions();
+
+        }
+
+
         setupRecyclerView();
-        getQuestions();
+        setListeners();
 
 
+    }
+
+    private void restoreStates(Bundle savedInstanceState) {
+
+        startTime = savedInstanceState.getInt(CURRENT_TIME, 60);
+
+        binding.timeProgress.setPercentage(startTime * 6);
+        binding.timeProgress.setStepCountText(String.valueOf(startTime));
+        currentQuestion = savedInstanceState.getInt(CURRENT_QUESTION, 0);
+
+        Log.e("TIME", String.valueOf(startTime));
+
+        if (savedInstanceState.containsKey(USER_ANSWERS))
+            userChosenAnswers = savedInstanceState.getStringArrayList(USER_ANSWERS);
+
+        if (savedInstanceState.containsKey(CURRENT_CHOSEN_ASNWER))
+            currentChosenAnswer = savedInstanceState.getString(CURRENT_CHOSEN_ASNWER);
+
+
+        if (savedInstanceState.containsKey(QUESTION_RESULT))
+            results = savedInstanceState.getParcelableArrayList(QUESTION_RESULT);
+
+        currentChosenAnswerPosition = savedInstanceState.getInt(CURRENT_CHOSEN_ASNWER_POSITION, -1);
+
+
+        if (savedInstanceState.containsKey(DIFFICULTY))
+            difficulty = savedInstanceState.getString(DIFFICULTY);
+
+    }
+
+    private void setListeners() {
         binding.nextQuestion.setOnClickListener(v -> {
 
             userChosenAnswers.add(currentChosenAnswer);
@@ -104,9 +185,11 @@ public class QuestionActivity extends AppCompatActivity implements
                 return;
 
             // before going to the next question ,storing the current chosenAnswers
+            currentChosenAnswer = null;
+            currentChosenAnswerPosition = -1;
+
             populateQuestion();
         });
-
 
     }
 
@@ -150,16 +233,29 @@ public class QuestionActivity extends AppCompatActivity implements
         binding.question.setText(HTMLDecoder.decodeHtml(result.getQuestion()));
 
         //setting the answers
-        binding.answers.setAdapter(new QuestionAdapter(this, result.getIncorrectAnswers()
+        binding.answers.setAdapter(new QuestionAdapter(currentChosenAnswerPosition, this, result.getIncorrectAnswers()
                 , result.getCorrectAnswer(), this));
 
 
         Log.e("CORRECT", result.getCorrectAnswer());
 
-        //making the next question button greyed out and un-clickable
-        binding.nextQuestion.setCardBackgroundColor(ContextCompat.getColor(this, R.color.next_question_disabled));
-        binding.nextQuestion.setClickable(false);
 
+        shouldMakeNextQuestionButtonUnClickable(currentChosenAnswer != null);
+
+        hideProgressAndStartTiming();
+
+    }
+
+    void shouldMakeNextQuestionButtonUnClickable(boolean should) {
+        //making the next question button greyed out and un-clickable
+
+        if (should)
+            binding.nextQuestion.setCardBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
+        else
+            binding.nextQuestion.setCardBackgroundColor(ContextCompat.getColor(this, R.color.next_question_disabled));
+
+
+        binding.nextQuestion.setClickable(should);
     }
 
     private boolean checkIfGameFinished() {
@@ -173,7 +269,7 @@ public class QuestionActivity extends AppCompatActivity implements
             Toast.makeText(this, "We are out of question", Toast.LENGTH_LONG).show();
             int wonPoints = AnswerChecker.getCorrectAnswerPoints(difficulty, results, userChosenAnswers);
             FireBaseUtils.sendUserWonPoints(difficulty, wonPoints, this);
-
+            AnswerChecker.storeUserPoints(this, wonPoints);
             progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("Calculating Points");
             progressDialog.show();
@@ -227,23 +323,26 @@ public class QuestionActivity extends AppCompatActivity implements
 
                 oppRef = getMeAsOpponentRef(uid);
                 oppRef.child(DUEL_CHALLENGE_QUESTIONS).setValue(response)
-                        .addOnCompleteListener(task -> {
-                            oppRef.child(DUEL_CHALLENGE_STATUS).setValue(START_DUEL_NOW).
-                                    addOnCompleteListener(task1 -> populateQuestion());
-                        });
+                        .addOnCompleteListener(task -> oppRef.child(DUEL_CHALLENGE_STATUS).setValue(START_DUEL_NOW).
+                                addOnCompleteListener(task1 -> populateQuestion()));
             } else
                 populateQuestion();
 
             userChosenAnswers = new ArrayList<>();
         }
-        binding.questionLayout.setVisibility(View.VISIBLE);
-        binding.waitDialogLayout.waitDialog.setVisibility(View.GONE);
-
-        asyncTask = new TimerAsyncTask(this);
-        asyncTask.execute();
 
 
     }
+
+    private void hideProgressAndStartTiming() {
+        binding.questionLayout.setVisibility(View.VISIBLE);
+        binding.waitDialogLayout.waitDialog.setVisibility(View.GONE);
+
+        asyncTask = new TimerAsyncTask(startTime, this);
+        asyncTask.execute();
+
+    }
+
 
     @Override
     public void onError(Throwable throwable) {
@@ -251,19 +350,22 @@ public class QuestionActivity extends AppCompatActivity implements
 
     }
 
+
     @Override
     protected void onPause() {
         super.onPause();
-        if (asyncTask != null)
+        if (asyncTask != null) {
             asyncTask.cancel(true);
+        }
     }
 
     @Override
     public void onItemClicked(int position, String chosenAnswer) {
-        binding.nextQuestion.setClickable(true);
-        binding.nextQuestion.setCardBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
         currentChosenAnswer = chosenAnswer;
+        currentChosenAnswerPosition = position;
+        shouldMakeNextQuestionButtonUnClickable(true);
     }
+
 
     @Override
     public void onItemClicked(int position) {
@@ -311,7 +413,9 @@ public class QuestionActivity extends AppCompatActivity implements
                 Intent intent = new Intent(this, WinActivity.class);
                 intent.putExtra(WinActivity.GAME_RESULT, WinActivity.RESULT_LOST);
                 startActivity(intent);
-                userOnQuestion.setValue(-1);
+                if (gamesStatus == STATUS_MULTIPLE)
+                    userOnQuestion.setValue(-1);
+
                 finish();
             }
         });

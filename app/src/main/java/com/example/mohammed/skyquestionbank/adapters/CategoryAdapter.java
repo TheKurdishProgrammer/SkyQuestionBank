@@ -21,11 +21,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     private List<Category> categories;
     private OnRecyclerItemClick listener;
     private CategoryViewHolder lastHolder;
+    private int categoryPosition;
 
-    public CategoryAdapter(Context context, List<Category> categories, OnRecyclerItemClick listener) {
+    public CategoryAdapter(int categoryPosition, Context context, List<Category> categories, OnRecyclerItemClick listener) {
         this.context = context;
         this.categories = categories;
         this.listener = listener;
+        this.categoryPosition = categoryPosition;
         setHasStableIds(true);
     }
 
@@ -45,7 +47,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
     @Override
     public void onBindViewHolder(@NonNull CategoryViewHolder holder, int position) {
-        if (holder.getAdapterPosition() == 0) {
+        if (holder.getAdapterPosition() == categoryPosition) {
             holder.catRadio.setChecked(true);
             lastHolder = holder;
         }

@@ -1,10 +1,13 @@
 package com.example.mohammed.skyquestionbank.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class QuestionResults {
+public class QuestionResults implements Parcelable {
     /**
      * category : Science: Computers
      * type : multiple
@@ -26,6 +29,27 @@ public class QuestionResults {
     private String correctAnswer;
     @SerializedName("incorrect_answers")
     private List<String> incorrectAnswers;
+
+    public static final Creator<QuestionResults> CREATOR = new Creator<QuestionResults>() {
+        @Override
+        public QuestionResults createFromParcel(Parcel in) {
+            return new QuestionResults(in);
+        }
+
+        @Override
+        public QuestionResults[] newArray(int size) {
+            return new QuestionResults[size];
+        }
+    };
+
+    protected QuestionResults(Parcel in) {
+        category = in.readString();
+        type = in.readString();
+        difficulty = in.readString();
+        question = in.readString();
+        correctAnswer = in.readString();
+        incorrectAnswers = in.createStringArrayList();
+    }
 
     public String getCategory() {
         return category;
@@ -73,5 +97,20 @@ public class QuestionResults {
 
     public void setIncorrectAnswers(List<String> incorrectAnswers) {
         this.incorrectAnswers = incorrectAnswers;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(category);
+        dest.writeString(type);
+        dest.writeString(difficulty);
+        dest.writeString(question);
+        dest.writeString(correctAnswer);
+        dest.writeStringList(incorrectAnswers);
     }
 }

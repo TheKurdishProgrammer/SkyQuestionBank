@@ -5,7 +5,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 
 import com.example.mohammed.skyquestionbank.R;
 import com.example.mohammed.skyquestionbank.firebase.FireBaseUtils;
@@ -19,6 +18,10 @@ import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 public class MainActivity extends AppCompatActivity {
 
 
@@ -26,8 +29,12 @@ public class MainActivity extends AppCompatActivity {
     public final static int PLAYER_SINGLE = 1;
     public final static int PLAYER_MULTIPLE = 2;
     public final static String CHALLENGE_STATUS = "CHALLENGE_STATUS";
+    private static final String CURRENT_FRAGMENT = "CURRENT_FRAGMENT";
+    private static final String CURRENT_FRAGMENT_INDEX = "CURRENT_FRAGMENT_INDEX";
     private Toolbar toolbar;
     private Drawer drawer;
+    private List<Fragment> fragments;
+    private int currentFragmentIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,34 +42,46 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         toolbar = findViewById(R.id.toolbar_drawer);
-
+        fragments = new ArrayList<>();
         int challengeStatus = getIntent().getIntExtra(CHALLENGE_STATUS, PLAYER_SINGLE);
-        Log.e("PLAYER", "challenge Status" + challengeStatus);
 
 
         setupTheDrawer(savedInstanceState);
 
-        ChooseQuestionCriteriaFragment questionCriteria = new ChooseQuestionCriteriaFragment();
 
-        if (challengeStatus == PLAYER_SINGLE) {
-            toolbar.setTitle(getString(R.string.choose_criteria));
-            FireBaseUtils.putUserOnline();
+        fragments.add(new ChooseQuestionCriteriaFragment());
+        fragments.add(new ChallengeFriendFragment());
+        fragments.add(new LeaderBoardsFragment());
+        fragments.add(new AboutFragment());
 
-        } else {
-            toolbar.setTitle(getString(R.string.challenge_friend));
-            Bundle bundle = new Bundle();
 
-            String uid = getIntent().getStringExtra(UID);
-
-            bundle.putInt(CHALLENGE_STATUS, challengeStatus);
-            bundle.putString(UID, uid);
-
-            questionCriteria.setArguments(bundle);
+        if (savedInstanceState != null) {
+            currentFragmentIndex = savedInstanceState.getInt(CURRENT_FRAGMENT_INDEX);
+            Fragment fragment = getSupportFragmentManager().getFragment(savedInstanceState, CURRENT_FRAGMENT);
+            fragments.set(currentFragmentIndex, fragment);
         }
 
-        transactFragment(questionCriteria);
-    }
 
+        if (currentFragmentIndex == 0 || savedInstanceState == null) {
+            if (challengeStatus == PLAYER_SINGLE) {
+                toolbar.setTitle(getString(R.string.choose_criteria));
+                FireBaseUtils.putUserOnline();
+
+            } else {
+                toolbar.setTitle(getString(R.string.challenge_friend));
+                Bundle bundle = new Bundle();
+
+                String uid = getIntent().getStringExtra(UID);
+
+                bundle.putInt(CHALLENGE_STATUS, challengeStatus);
+                bundle.putString(UID, uid);
+
+                fragments.get(0).setArguments(bundle);
+            }
+        }
+        transactFragment(fragments.get(currentFragmentIndex));
+
+    }
     private void setupTheDrawer(Bundle savedInstance) {
 
 
@@ -101,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
         drawer = new DrawerBuilder()
                 .withActivity(this)
+                .withSavedInstance(savedInstance)
                 .withToolbar(toolbar)
                 .withShowDrawerOnFirstLaunch(true)
                 .withShowDrawerUntilDraggedOpened(true)
@@ -112,32 +132,49 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     switch (position) {
                         case 1:
+                            currentFragmentIndex = 0;
                             toolbar.setTitle(R.string.choose_criteria);
-                            transactFragment(new ChooseQuestionCriteriaFragment());
                             break;
                         case 2:
+                            currentFragmentIndex = 1;
                             toolbar.setTitle(getString(R.string.challenge_friend));
-                            transactFragment(new ChallengeFriendFragment());
                             break;
                         case 3:
+                            currentFragmentIndex = 2;
                             toolbar.setTitle(getString(R.string.leadrboards));
-                            transactFragment(new LeaderBoardsFragment());
                             break;
                         case 5:
+                            currentFragmentIndex = 3;
                             toolbar.setTitle(getString(R.string.about));
-                            transactFragment(new AboutFragment());
                             break;
                     }
+
+                    transactFragment(fragments.get(currentFragmentIndex));
                     return true;
                 })
                 .build();
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        drawer.saveInstanceState(outState);
+
+
+        outState.putInt(CURRENT_FRAGMENT_INDEX, currentFragmentIndex);
+
+        if (!getSupportFragmentManager().executePendingTransactions())
+            getSupportFragmentManager().putFragment(outState, CURRENT_FRAGMENT, fragments.get(currentFragmentIndex));
+
+        super.onSaveInstanceState(outState);
+    }
+
     private void transactFragment(Fragment fragment) {
 
+
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+
         fragmentTransaction.replace(R.id.fragment_view, fragment);
-        fragmentTransaction.commit();
+        fragmentTransaction.commitNow();
         drawer.closeDrawer();
     }
 }

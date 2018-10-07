@@ -58,6 +58,7 @@ public class LoginActivity extends AppCompatActivity implements OnUserLoggedIn {
 
                 if (resultCode == RESULT_OK) {
                     FireBaseUtils.createUser(this);
+                    finish();
                     return;
 
                 } else if (resultCode == RESULT_CANCELED) {

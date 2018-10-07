@@ -2,7 +2,7 @@ package com.example.mohammed.skyquestionbank.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class QuestionResponse {
 
@@ -14,7 +14,7 @@ public class QuestionResponse {
     @SerializedName("response_code")
     private int responseCode;
     @SerializedName("results")
-    private List<QuestionResults> results;
+    private ArrayList<QuestionResults> results;
 
     public int getResponseCode() {
         return responseCode;
@@ -24,11 +24,11 @@ public class QuestionResponse {
         this.responseCode = responseCode;
     }
 
-    public List<QuestionResults> getResults() {
+    public ArrayList<QuestionResults> getResults() {
         return results;
     }
 
-    public void setResults(List<QuestionResults> results) {
+    public void setResults(ArrayList<QuestionResults> results) {
         this.results = results;
     }
 }

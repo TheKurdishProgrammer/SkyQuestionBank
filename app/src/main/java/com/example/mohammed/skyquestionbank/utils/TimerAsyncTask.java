@@ -7,18 +7,26 @@ import com.example.mohammed.skyquestionbank.interfaces.OnTimeProgressUpdate;
 public class TimerAsyncTask extends AsyncTask<Void, Integer, Void> {
 
     private OnTimeProgressUpdate onUpdate;
+    private int startTime;
+    private int curretnTime;
 
-    public TimerAsyncTask(OnTimeProgressUpdate onUpdate) {
+
+    public TimerAsyncTask(int startTime, OnTimeProgressUpdate onUpdate) {
         this.onUpdate = onUpdate;
+        this.startTime = startTime;
+    }
+
+    public int getCurrentTime() {
+        return curretnTime;
     }
 
     @Override
     protected Void doInBackground(Void... voids) {
 
-        for (int i = 59; i >= 0 && !isCancelled(); i--) {
+        for (int i = startTime; i >= 0 && !isCancelled(); i--) {
             try {
                 Thread.sleep(1000);
-
+                curretnTime = i;
                 onProgressUpdate(i);
 
             } catch (InterruptedException e) {
