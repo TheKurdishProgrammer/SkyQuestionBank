@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 
 import com.example.mohammed.skyquestionbank.R;
 import com.example.mohammed.skyquestionbank.databinding.ActivityDuelChellengeBinding;
@@ -28,9 +29,27 @@ public class DuelChallengeActivity extends AppCompatActivity implements OnChalle
     private OnlineUser user;
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case android.R.id.home:
+                finish();
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_duel_chellenge);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         user = getIntent().getParcelableExtra(OPPONENT_KEY);
         populateUI();

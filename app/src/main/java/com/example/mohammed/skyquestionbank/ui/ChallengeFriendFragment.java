@@ -3,6 +3,7 @@ package com.example.mohammed.skyquestionbank.ui;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import com.example.mohammed.skyquestionbank.databinding.FragmentChallengeFriendB
 import com.example.mohammed.skyquestionbank.firebase.FireBaseUtils;
 import com.example.mohammed.skyquestionbank.interfaces.OnOnlineFriendListLoad;
 import com.example.mohammed.skyquestionbank.models.OnlineUser;
+import com.example.mohammed.skyquestionbank.utils.InternetConnectivityChecker;
 
 import java.util.List;
 
@@ -36,10 +38,12 @@ public class ChallengeFriendFragment extends Fragment implements OnOnlineFriendL
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_challenge_friend, container, false);
 
         FireBaseUtils.getOnlineFriendList(this);
-
+        if (!InternetConnectivityChecker.isConnected(getContext()))
+            Snackbar.make(null, R.string.no_connection, Snackbar.LENGTH_LONG).show();
         return binding.getRoot();
 
     }
+
 
     @Override
     public void onLoadList(List<OnlineUser> users) {

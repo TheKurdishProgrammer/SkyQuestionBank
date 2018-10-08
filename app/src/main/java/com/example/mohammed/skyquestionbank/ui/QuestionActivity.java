@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -116,7 +117,7 @@ public class QuestionActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_question);
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         gamesStatus = getIntent().getIntExtra(GAME_STATUS_KEY, STATUS_SINGLE);
 
@@ -258,6 +259,21 @@ public class QuestionActivity extends AppCompatActivity implements
         binding.nextQuestion.setClickable(should);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case android.R.id.home:
+                finish();
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+
+
+    }
     private boolean checkIfGameFinished() {
 
         if (currentQuestion == results.size()) {

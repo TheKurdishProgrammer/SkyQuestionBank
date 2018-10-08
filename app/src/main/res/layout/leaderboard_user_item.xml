@@ -27,7 +27,7 @@
         <com.mikhaellopez.circularimageview.CircularImageView
             android:id="@+id/user_photo"
             android:layout_width="60dp"
-
+            android:contentDescription="@string/this_is_user_account_photo_picture"
             android:layout_height="60dp"
 
             android:src="@drawable/ic_launcher_background"

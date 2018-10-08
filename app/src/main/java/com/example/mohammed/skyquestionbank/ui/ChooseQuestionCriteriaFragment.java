@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,13 +17,14 @@ import android.widget.TextView;
 
 import com.example.mohammed.skyquestionbank.R;
 import com.example.mohammed.skyquestionbank.adapters.CategoryAdapter;
-import com.example.mohammed.skyquestionbank.databinding.QuizCriteriaBinding;
+import com.example.mohammed.skyquestionbank.databinding.FragmentChooseCriteriaBinding;
 import com.example.mohammed.skyquestionbank.firebase.FirebaseQuestionReferences;
 import com.example.mohammed.skyquestionbank.interfaces.OnRecyclerItemClick;
 import com.example.mohammed.skyquestionbank.interfaces.OnResponseCallback;
 import com.example.mohammed.skyquestionbank.models.Category;
 import com.example.mohammed.skyquestionbank.models.CategoryResponse;
 import com.example.mohammed.skyquestionbank.networking.QuestionDataDownloader;
+import com.example.mohammed.skyquestionbank.utils.InternetConnectivityChecker;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.List;
@@ -48,7 +50,7 @@ public class ChooseQuestionCriteriaFragment extends Fragment implements OnRespon
     private static final String CATEGORY_RESPONSE = "CATEGORY_RESPONSE";
     private List<Category> categories;
     private int lastClickedCategoryRadionPos = -1;
-    private QuizCriteriaBinding binding;
+    private FragmentChooseCriteriaBinding binding;
 
 
     public final static String DIFFICULTY_EASY = "easy";
@@ -73,7 +75,7 @@ public class ChooseQuestionCriteriaFragment extends Fragment implements OnRespon
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        binding = DataBindingUtil.inflate(inflater, R.layout.quiz_criteria, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_choose_criteria, container, false);
         setListeners();
 
         if (savedInstanceState != null) {
@@ -84,15 +86,37 @@ public class ChooseQuestionCriteriaFragment extends Fragment implements OnRespon
             populateUi(response);
         } else {
 
-            QuestionDataDownloader dataDownloader = new QuestionDataDownloader();
-            dataDownloader.getCategories(this);
+            getCategories();
         }
         return binding.getRoot();
+    }
+
+    private void getCategories() {
+        QuestionDataDownloader dataDownloader = new QuestionDataDownloader();
+        dataDownloader.getCategories(this);
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (response == null)
+            getCategories();
+        else
+            populateUi(response);
     }
 
     private void setListeners() {
         binding.startChallenge.setOnClickListener(v -> {
 
+            if (response == null) {
+                if (InternetConnectivityChecker.isConnected(getContext()))
+                    getCategories();
+                else
+                    Snackbar.make(binding.startChallenge, R.string.no_connection, Snackbar.LENGTH_LONG).show();
+
+                return;
+            }
             Intent intent = getIntentWithCriteria(new Intent(getContext(), QuestionActivity.class));
 
             Bundle bundle = getArguments();
@@ -212,6 +236,8 @@ public class ChooseQuestionCriteriaFragment extends Fragment implements OnRespon
     @Override
     public void onError(Throwable throwable) {
         Log.e(getClass().getSimpleName(), throwable.getMessage());
+        binding.waitDialogLayout.waitDialog.setVisibility(View.GONE);
+        Snackbar.make(binding.startChallenge, R.string.no_connection, Snackbar.LENGTH_LONG).show();
     }
 
     public void onItemClicked(int position) {

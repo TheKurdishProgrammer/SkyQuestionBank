@@ -22,6 +22,7 @@
                 android:id="@+id/game_result"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
+                android:contentDescription="@string/game_result"
                 android:src="@drawable/award" />
 
             <TextView
@@ -54,7 +55,7 @@
                     android:layout_height="match_parent"
                     android:background="@android:color/transparent"
                     android:onClick="goMain"
-                    android:text="Go Home Screen"
+                    android:text="@string/go_home_screen"
                     android:textSize="20sp" />
             </android.support.v7.widget.CardView>
         </LinearLayout>

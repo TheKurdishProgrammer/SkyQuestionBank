@@ -3,6 +3,7 @@ package com.example.mohammed.skyquestionbank.ui;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,7 @@ import com.example.mohammed.skyquestionbank.adapters.LeaderBoardAdapter;
 import com.example.mohammed.skyquestionbank.firebase.FireBaseUtils;
 import com.example.mohammed.skyquestionbank.interfaces.OnUserLoad;
 import com.example.mohammed.skyquestionbank.models.User;
+import com.example.mohammed.skyquestionbank.utils.InternetConnectivityChecker;
 
 import java.util.List;
 
@@ -40,7 +42,11 @@ public class LeaderBoardsFragment extends Fragment implements OnUserLoad {
         progressBar = view.findViewById(R.id.progressBar);
 
         setupRecycler();
-        FireBaseUtils.getUsers(this);
+        if (InternetConnectivityChecker.isConnected(getContext()))
+            Snackbar.make(view.findViewById(R.id.refresh_list), R.string.no_connection, Snackbar.LENGTH_LONG).show();
+        else
+
+            FireBaseUtils.getUsers(this);
 
 
         return view;

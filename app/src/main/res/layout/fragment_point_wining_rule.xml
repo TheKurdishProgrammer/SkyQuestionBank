@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-condensed"
         android:gravity="center"
-        android:text="Question Criteria Points"
+        android:text="@string/question_criteria_points"
         android:textColor="@color/accent"
         android:textSize="28sp" />
 
@@ -36,14 +36,14 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="1-Point awarding pet question\nEasy -> 1 point\nMedium -> 2 points\n3-Hard -> 3 Points"
+                android:text="@string/rule_1"
                 android:textColor="@color/md_black_1000"
                 android:textSize="20sp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="No points will be given if time is up during any question"
+                android:text="@string/no_point"
                 android:textColor="@color/md_black_1000"
                 android:textSize="16sp"
                 android:textStyle="bold" />

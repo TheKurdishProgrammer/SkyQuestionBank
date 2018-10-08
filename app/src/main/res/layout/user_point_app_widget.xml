@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/user_points"
-        android:text="Points"
+        android:text="@string/points"
         android:textAlignment="center"
         android:textColor="#ffffff"
         android:textSize="24sp"

@@ -116,7 +116,6 @@ public class FireBaseUtils {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
     }

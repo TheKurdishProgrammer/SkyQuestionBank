@@ -8,6 +8,7 @@
 
 
     <RelativeLayout
+
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorScreenBackground">
@@ -18,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-smallcaps"
-            android:text="match About to start"
+            android:text="@string/match_about_to_start"
             android:textAlignment="center"
             android:textColor="@color/md_white_1000"
             android:textSize="42sp" />
@@ -44,6 +45,7 @@
                     android:id="@+id/player_me_photo"
                     android:layout_width="84dp"
                     android:layout_height="84dp"
+                    android:contentDescription="@string/this_is_the_picture_of_you"
                     android:layout_gravity="center"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_launcher_background" />
@@ -52,7 +54,6 @@
                     android:id="@+id/player_me_name"
                     android:layout_width="match_parent"
                     android:layout_height="32dp"
-                    android:text="Mohammed Huw33in"
                     android:textAlignment="center"
                     android:textColor="@color/md_white_1000" />
             </LinearLayout>
@@ -63,7 +64,7 @@
                 android:layout_weight="1"
                 android:fontFamily="cursive"
                 android:gravity="center"
-                android:text="VS"
+                android:text="@string/vs"
                 android:textColor="@color/md_white_1000"
                 android:textSize="48sp" />
 
@@ -79,6 +80,7 @@
                     android:layout_width="84dp"
                     android:layout_height="84dp"
                     android:layout_gravity="center"
+                    android:contentDescription="@string/this_is_the_picture_of_opponenet"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_launcher_background" />
 
@@ -86,7 +88,6 @@
                     android:id="@+id/player_he_she_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Mohammed Hussen"
                     android:textAlignment="center"
                     android:textColor="@color/md_white_1000" />
             </LinearLayout>

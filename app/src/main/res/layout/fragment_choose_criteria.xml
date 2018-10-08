@@ -29,7 +29,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-condensed"
-                    android:text="Select  Question Type"
+                    android:text="@string/select_question_type"
                     android:textColor="@color/colorAccent"
                     android:textSize="20sp" />
 
@@ -44,14 +44,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="Multiple Choice"
+                        android:text="@string/multiple_choice"
                         android:textColor="@color/md_white_1000" />
 
                     <RadioButton
                         android:id="@+id/bool"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="True and False"
+                        android:text="@string/true_and_false"
                         android:textColor="@color/md_white_1000" />
 
                 </RadioGroup>
@@ -61,7 +61,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-condensed"
-                    android:text="Select Difficulty"
+                    android:text="@string/select_difficulty"
                     android:textColor="@color/colorAccent"
                     android:textSize="20sp" />
 
@@ -76,21 +76,21 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="Hard"
+                        android:text="@string/hard"
                         android:textColor="@color/md_white_1000" />
 
                     <RadioButton
                         android:id="@+id/medium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Medium"
+                        android:text="@string/medium"
                         android:textColor="@color/md_white_1000" />
 
                     <RadioButton
                         android:id="@+id/Easy"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Easy"
+                        android:text="@string/easy"
                         android:textColor="@color/md_white_1000" />
                 </RadioGroup>
 
@@ -103,7 +103,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-condensed"
-                        android:text="Number Of Questions:"
+                        android:text="@string/number_of_questions"
                         android:textColor="@color/colorAccent"
                         android:textSize="20sp" />
 
@@ -121,7 +121,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Select a Category"
+                    android:text="@string/select_a_category"
                     android:textColor="@color/colorAccent"
                     android:textSize="20sp" />
 
@@ -151,7 +151,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="@color/colorAccent"
-                        android:text="Start Challenge"
+                        android:text="@string/start_challenge"
                         android:textColor="@android:color/white" />
                 </android.support.v7.widget.CardView>
             </LinearLayout>

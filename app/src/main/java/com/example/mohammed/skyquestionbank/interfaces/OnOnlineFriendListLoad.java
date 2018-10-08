@@ -7,4 +7,5 @@ import java.util.List;
 public interface OnOnlineFriendListLoad {
 
     void onLoadList(List<OnlineUser> users);
+
 }

@@ -44,5 +44,37 @@
     <string name="about">Point Rules</string>
     <string name="leadrboards">LeaderBoards</string>
     <string name="new_challenge">New Challenge</string>
+    <string name="no_connection">No Internet Connection</string>
+    <string name="sign_try_again">Try Again</string>
+    <string name="welcome_to_sky">Welcome To Sky</string>
+    <string name="match_about_to_start">match About to start</string>
+    <string name="vs">VS</string>
+    <string name="please_wait">Please wait</string>
+    <string name="go_home_screen">Go Home Screen</string>
+    <string name="no_friend_found_online">No Friend Found Online</string>
+    <string name="question_criteria_points">Question Criteria Points</string>
+    <string name="rule_1"><![CDATA[1-Point awarding pet question Easy -> 1 point Medium -> 2 points 3-Hard -> 3 Points]]></string>
+    <string name="no_point">No points will be given if time is up during any question</string>
+    <string name="no_question_found">No Question Found!</string>
+    <string name="points">Points</string>
+    <string name="select_question_type">Select Question Type</string>
+    <string name="multiple_choice">Multiple Choice</string>
+    <string name="true_and_false">True and False</string>
+    <string name="select_difficulty">Select Difficulty</string>
+    <string name="hard">Hard</string>
+    <string name="medium">Medium</string>
+    <string name="easy">Easy</string>
+    <string name="number_of_questions">Number Of Questions:</string>
+    <string name="select_a_category">Select a Category</string>
+    <string name="start_challenge">Start Challenge</string>
+    <string name="choose_another_question_criteria">choose another Question Criteria</string>
+    <string name="time_start">60</string>
+    <string name="this_is_user_account_photo_picture">This is User Account Photo picture</string>
+    <string name="this_is_user_online_status">This is User Online Status</string>
+    <string name="this_is_the_picture_of_opponenet">this is the picture of opponenet</string>
+    <string name="this_is_the_picture_of_you">this is the picture of you</string>
+    <string name="next_question">Next Question</string>
+    <string name="game_result">This is Game Result</string>
+    <string name="no_online">No Friend is Online</string>
 
 </resources>

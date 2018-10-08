@@ -2,11 +2,13 @@ package com.example.mohammed.skyquestionbank.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.mohammed.skyquestionbank.R;
 import com.example.mohammed.skyquestionbank.firebase.FireBaseUtils;
 import com.example.mohammed.skyquestionbank.interfaces.OnUserLoggedIn;
+import com.example.mohammed.skyquestionbank.utils.InternetConnectivityChecker;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
@@ -35,17 +37,42 @@ public class LoginActivity extends AppCompatActivity implements OnUserLoggedIn {
         SignInButton mEmailSignInButton = findViewById(R.id.sign_in);
 
         mEmailSignInButton.setOnClickListener(view -> {
-//            attemptLogin();
-
-            startActivityForResult(
-                    AuthUI.getInstance().createSignInIntentBuilder()
-                            .setLogo(R.drawable.busy_icon)
-                            .setTheme(R.style.FirebaseUI)
-                            .setAvailableProviders(Arrays.asList(
-                                    new AuthUI.IdpConfig.GoogleBuilder().build()))
-                            .build(), LOGIN_CODE);
+            loginWithInfo(mEmailSignInButton);
         });
 
+
+    }
+
+
+    void loginWithInfo(SignInButton mEmailSignInButton) {
+
+        if (!isConnection(mEmailSignInButton))
+            return;
+
+
+        startActivityForResult(
+                AuthUI.getInstance().createSignInIntentBuilder()
+                        .setLogo(R.drawable.busy_icon)
+                        .setTheme(R.style.FirebaseUI)
+                        .setAvailableProviders(Arrays.asList(
+                                new AuthUI.IdpConfig.GoogleBuilder().build()))
+                        .build(), LOGIN_CODE);
+
+    }
+
+    private boolean isConnection(SignInButton mEmailSignInButton) {
+
+        if (!InternetConnectivityChecker.isConnected(this)) {
+
+            Snackbar.make(mEmailSignInButton, getString(R.string.no_connection), Snackbar.LENGTH_LONG)
+                    .setAction(getString(R.string.sign_try_again), snack -> {
+                        loginWithInfo(mEmailSignInButton);
+                    }).show();
+
+            return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -58,7 +85,6 @@ public class LoginActivity extends AppCompatActivity implements OnUserLoggedIn {
 
                 if (resultCode == RESULT_OK) {
                     FireBaseUtils.createUser(this);
-                    finish();
                     return;
 
                 } else if (resultCode == RESULT_CANCELED) {
